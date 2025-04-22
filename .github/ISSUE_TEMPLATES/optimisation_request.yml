@@ -1,0 +1,20 @@
+name: "Optimization Task"
+description: "Improve performance or scalability of the extension"
+title: "[Optimization] <title>"
+labels: ["optimization"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What is being optimized and why?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Change
+      description: How should the optimization be implemented?
+    validations:
+      required: false

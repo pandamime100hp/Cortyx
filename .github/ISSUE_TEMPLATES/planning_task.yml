@@ -1,0 +1,20 @@
+name: "Planning / Research Task"
+description: "Plan a future implementation or gather information"
+title: "[Planning] <title>"
+labels: ["planning"]
+body:
+  - type: textarea
+    id: scope
+    attributes:
+      label: Task Scope
+      description: What needs to be researched or planned?
+    validations:
+      required: true
+
+  - type: textarea
+    id: considerations
+    attributes:
+      label: Considerations
+      description: What should be considered in this plan?
+    validations:
+      required: false
