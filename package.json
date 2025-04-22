@@ -1,0 +1,19 @@
+{
+  "name": "cortyx",
+  "version": "1.0.0",
+  "description": "Cortyx is a powerful VS Code extension designed to assist developers by offering intelligent code suggestions and insights. By analyzing your project’s codebase, Cortyx provides relevant recommendations, highlights areas for improvement, and helps debug issues — all in real-time.",
+  "main": "extension.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pandamime100hp/Cortyx.git"
+  },
+  "author": "pandamime100hp@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pandamime100hp/Cortyx/issues"
+  },
+  "homepage": "https://github.com/pandamime100hp/Cortyx#readme"
+}
