@@ -1,0 +1,35 @@
+name: "Project Task"
+description: "Track tasks related to project configuration, CI/CD, and other foundational setup."
+title: "[Project] <title>"
+labels: ["project"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What needs to be configured or set up for the project?
+      placeholder: Explain the task in detail.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps or Configuration Needed
+      description: What steps or configuration needs to be completed for this task?
+    validations:
+      required: false
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact of Task
+      description: How will this task improve the project or development workflow?
+    validations:
+      required: false
+
+  - type: input
+    id: related
+    attributes:
+      label: Related Issues or PRs
+      description: Link to any related issues or pull requests.
