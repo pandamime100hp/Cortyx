@@ -1,0 +1,27 @@
+name: "Feature Request"
+description: "Suggest a new feature for the extension"
+title: "[Feature] <title>"
+labels: ["feature"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What should this feature do?
+      placeholder: Explain the feature clearly.
+    validations:
+      required: true
+
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Rationale
+      description: Why is this feature important or valuable?
+    validations:
+      required: false
+
+  - type: input
+    id: related
+    attributes:
+      label: Related Issues or PRs
+      description: Link to any related issues or pull requests.
