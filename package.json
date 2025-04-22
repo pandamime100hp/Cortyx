@@ -5,7 +5,7 @@
   "main": "extension.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "echo \"Error: no lint specified\" && exit 1",
+    "lint": "npx eslint",
     "build": "echo \"Error: no build specified\" && exit 1"
   },
   "repository": {
@@ -17,5 +17,11 @@
   "bugs": {
     "url": "https://github.com/pandamime100hp/Cortyx/issues"
   },
-  "homepage": "https://github.com/pandamime100hp/Cortyx#readme"
+  "homepage": "https://github.com/pandamime100hp/Cortyx#readme",
+  "devDependencies": {
+    "@eslint/js": "^9.25.1",
+    "eslint": "^9.25.1",
+    "globals": "^16.0.0",
+    "typescript-eslint": "^8.31.0"
+  }
 }
