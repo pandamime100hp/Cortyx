@@ -1,13 +1,27 @@
 {
   "name": "cortyx",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Cortyx is a powerful VS Code extension designed to assist developers by offering intelligent code suggestions and insights. By analyzing your project’s codebase, Cortyx provides relevant recommendations, highlights areas for improvement, and helps debug issues — all in real-time.",
-  "main": ".build/extension.js",
-  "type": "module",
+  "main": ".build/src/extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "engines": {
+    "vscode": "^1.99.0"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.cortyx",
+        "title": "Cortyx"
+      }
+    ]
+  },
+  "type": "commonjs",
   "scripts": {
     "test": "npx jest",
+    "coverage": "npx jest --coverage",
     "lint": "eslint",
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "package": "vsce package"
   },
   "repository": {
     "type": "git",
@@ -26,6 +40,7 @@
     "globals": "^16.0.0",
     "ts-jest": "^29.3.2",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.31.0"
+    "typescript-eslint": "^8.31.0",
+    "vscode": "^1.1.34"
   }
 }
