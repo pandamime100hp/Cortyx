@@ -1,6 +1,5 @@
 import * as vscode from './mocks/vscode';
 import { activate, deactivate } from '../src/extension'
-import { ExtensionContext } from 'vscode';
 
 console.log(vscode);
 
