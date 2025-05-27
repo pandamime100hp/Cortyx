@@ -42,9 +42,9 @@ describe('Open AI Strategy', () => {
     });
 
     it('should return missing env vars exception', () => {
-        process.env.OPENAI_SA_API_KEY = undefined;
-        process.env.OPENAI_URL = undefined;
-        expect(new OpenAIStrategy()).toThrow('Missing OpenAI environment variables.');
+        delete process.env.OPENAI_SA_API_KEY;
+        delete process.env.OPENAI_URL;
+        expect(() => new OpenAIStrategy()).toThrow('Missing OpenAI environment variables.');
     });
 
     it('should return mocked models', async () => {          
