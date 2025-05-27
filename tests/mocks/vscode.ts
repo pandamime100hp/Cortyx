@@ -8,6 +8,12 @@ export const window = {
   showInformationMessage: jest.fn(),
 };
 
+export const workspace = {
+  workspaceFolders: [
+    { uri: { fsPath: '/mock/project/root' } }
+  ]
+};
+
 export const mockContext: ExtensionContext = {
   subscriptions: [],
   workspaceState: {} as Memento,

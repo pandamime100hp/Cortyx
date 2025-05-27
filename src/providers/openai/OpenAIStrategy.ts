@@ -1,9 +1,9 @@
-import { IAIModelStrategy } from "../IAIModelStrategy";
+import { IAIModelStrategy } from '../IAIModelStrategy';
 
-import { getBearerAuthHeader } from "../../utilities/auth";
-import { parseURL } from "../../utilities/strings";
+import { getBearerAuthHeader } from '../../utilities/auth';
+import { parseURL } from '../../utilities/strings';
 
-import { OpenAIEndpoints } from "./OpenAIEndpoints";
+import { OpenAIEndpoints } from './OpenAIEndpoints';
 
 
 export class OpenAIStrategy implements IAIModelStrategy{
@@ -27,7 +27,7 @@ export class OpenAIStrategy implements IAIModelStrategy{
     async generateResponse(prompt: string): Promise<string> {
         const completionsEndpoint: string = parseURL(this.url, OpenAIEndpoints.COMPLETIONS);
 
-        throw new Error("Method not implemented.");
+        throw new Error('Method not implemented.');
     }
 
     async getModels(): Promise<string>{

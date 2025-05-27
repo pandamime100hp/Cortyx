@@ -1,15 +1,9 @@
 import { parseURL } from "../../src/utilities/strings";
 
 describe("String Utilities", () => {
-    let url: string;
-    let endpoint: string;
-    let queryParams: Record<string, string | number>;
-
-    beforeEach(() => {
-        url = 'https://mock-api.openai.com/v1';
-        endpoint = 'endpoint';
-        queryParams = {'limit': 5, 'offset': 1000, 'country': 'BG'};
-    });
+    const url: string = 'https://mock-api.openai.com/v1';
+    let endpoint = 'endpoint';
+    const queryParams: Record<string, string | number> = {'limit': 5, 'offset': 1000, 'country': 'BG'};
 
     it("should return valid URL", () => {
         const result: string = parseURL(url, endpoint);
