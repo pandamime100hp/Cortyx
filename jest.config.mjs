@@ -7,4 +7,5 @@ export default {
   moduleNameMapper: {
     '^vscode$': '<rootDir>/tests/mocks/vscode.ts'
   },
+  // setupFiles: ['<rootDir>/jest.setup.ts']
 };
