@@ -5,16 +5,22 @@ import { parseURL } from '../../utilities/strings';
 
 import { OpenAIEndpoints } from './OpenAIEndpoints';
 
+import * as vscode from 'vscode'
+
 
 export class OpenAIStrategy implements IAIModelStrategy{
     // https://platform.openai.com/docs/api-reference/introduction
 
-    private readonly apiKey: string;
-    private readonly url: string;
+    private readonly apiKey;
+    private readonly url;
 
-    constructor(){
-        const apiKey = process.env.OPENAI_SA_API_KEY;
-        const url = process.env.OPENAI_URL;
+    constructor(context: vscode.ExtensionContext){
+        const apiKey = context.globalState.get('apiToken');
+        const url = context.globalState.get('apiUrl');
+
+
+        console.log(apiKey);
+        console.log(typeof(apiKey));
 
         if (!apiKey || !url){
             throw new Error('Missing OpenAI environment variables.');
@@ -25,15 +31,19 @@ export class OpenAIStrategy implements IAIModelStrategy{
     }
 
     async generateResponse(prompt: string): Promise<string> {
-        const completionsEndpoint: string = parseURL(this.url, OpenAIEndpoints.COMPLETIONS);
+        // const completionsEndpoint: string = parseURL(this.url, OpenAIEndpoints.COMPLETIONS);
 
         throw new Error('Method not implemented.');
     }
 
     async getModels(): Promise<string>{
-        const modelsEndpoint: string = parseURL(this.url, OpenAIEndpoints.MODELS);
+        const modelsEndpoint: string = parseURL(String(this.url), OpenAIEndpoints.MODELS);
 
-        const response = await fetch(modelsEndpoint)
+        const header = {
+            headers: getBearerAuthHeader(String(this.apiKey))
+        };
+
+        const response = await fetch(modelsEndpoint, header)
 
         if (!response.ok){
             const error = await response.text();
@@ -41,6 +51,7 @@ export class OpenAIStrategy implements IAIModelStrategy{
         }
 
         const data = await response.json();
+
         return data;
     }
 }
