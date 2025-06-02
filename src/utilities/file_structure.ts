@@ -14,7 +14,6 @@ export type FileNode = {
 };
 
 
-
 const FOLDERS = vscode.workspace.workspaceFolders;
 
 

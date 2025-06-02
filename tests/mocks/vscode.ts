@@ -6,7 +6,10 @@ export const commands = {
   
 export const window = {
   showInformationMessage: jest.fn(),
-  showErrorMessage: jest.fn()
+  showErrorMessage: jest.fn(),
+  showWarningMessage: jest.fn(),
+  showQuickPick: jest.fn(),
+  showInputBox: jest.fn()
 };
 
 export const workspace = {
@@ -15,10 +18,19 @@ export const workspace = {
   ]
 };
 
+export const mockGlobalState: ExtensionContext['globalState'] = {
+  get: jest.fn((key: string) => {
+    if (key === 'apiKey') return 'mock-key';
+    if (key === 'apiUrl') return 'https://mock-api.com/v1';
+    return undefined;
+  }),
+  update: jest.fn()
+};
+
 export const mockContext: ExtensionContext = {
   subscriptions: [],
   workspaceState: {} as Memento,
-  globalState: {} as Memento,
+  globalState: mockGlobalState as unknown as Memento,
   extensionPath: '',
   asAbsolutePath: jest.fn(),
   storagePath: '',

@@ -1,12 +1,14 @@
+import * as vscode from '../../mocks/vscode';
+import mockFetch, { createMockFetchResponse } from '../../mocks/fetch';
 import { OpenAIStrategy } from '../../../src/providers/openai/OpenAIStrategy';
+import { activate } from '../../../src/extension';
 
 
 describe('Open AI Strategy', () => {
-    let strategy: OpenAIStrategy;
-
     const mockModels = {
         'object': 'list',
-        'data': [{
+        'data': [
+            {
                 'id': 'model-id-0',
                 'object': 'model',
                 'created': 1686935002,
@@ -26,31 +28,58 @@ describe('Open AI Strategy', () => {
     }
 
     beforeEach(() => {
-        process.env.OPENAI_SA_API_KEY = 'mock_api_key';
-        process.env.OPENAI_URL = 'https://mock-api.openai.com/v1';
+        jest.spyOn(console, 'log').mockImplementation(() => {});
 
-        strategy = new OpenAIStrategy();
+        mockFetch.mockResolvedValue(createMockFetchResponse(mockModels));
 
-        global.fetch = jest.fn(() => Promise.resolve({
-            ok: true,
-            json: () => Promise.resolve(mockModels)
-        })) as jest.Mock;
+        vscode.mockContext.globalState.get = jest.fn((key: string) => {
+            if (key === 'apiKey') return 'mock_token';
+            if (key === 'apiUrl') return 'https://mock-api.openai.com/v1';
+            return undefined;
+        });
     });
 
     afterEach(() => {
+        (console.log as jest.Mock).mockRestore();
         jest.resetAllMocks();
     });
 
     it('should return missing env vars exception', () => {
-        delete process.env.OPENAI_SA_API_KEY;
-        delete process.env.OPENAI_URL;
-        expect(() => new OpenAIStrategy()).toThrow('Missing OpenAI environment variables.');
+        vscode.mockContext.globalState.get = jest.fn(() => undefined);
+        expect(() => new OpenAIStrategy(vscode.mockContext)).toThrow('Missing OpenAI environment variables');
     });
 
     it('should return mocked models', async () => {          
-        const result = await strategy.getModels()
+        const result = await new OpenAIStrategy(vscode.mockContext).getModels()
 
         expect(fetch).toHaveBeenCalled();
         expect(result).toStrictEqual(mockModels);
+    });
+
+    it('should call showInformationMessage for get_models', async () => {
+        await activate(vscode.mockContext);
+
+        const command = vscode.commands.registerCommand.mock.calls.find(
+            ([name]) => name === 'cortyx.get_models')?.[1];
+        
+        if (!command) {
+            throw new Error('get_models command not registered');
+        }
+        
+        await command();
+
+        expect(fetch).toHaveBeenCalled();
+        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(
+            expect.stringContaining('Models:')
+        );
+    });
+
+    it('should throw error when fetch response is not ok', async () => {
+        mockFetch.mockResolvedValue(createMockFetchResponse({ error: 'fail' }, 500)); // 500 status
+
+        const strategy = new OpenAIStrategy(vscode.mockContext);
+        await expect(strategy.getModels()).rejects.toThrow(/OpenAI error: 500/);
+
+        expect(fetch).toHaveBeenCalled();
     });
 });

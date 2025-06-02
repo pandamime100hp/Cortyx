@@ -11,19 +11,15 @@ import * as vscode from 'vscode'
 export class OpenAIStrategy implements IAIModelStrategy{
     // https://platform.openai.com/docs/api-reference/introduction
 
-    private readonly apiKey;
-    private readonly url;
+    private readonly apiKey: string;
+    private readonly url: string;
 
     constructor(context: vscode.ExtensionContext){
-        const apiKey = context.globalState.get('apiToken');
-        const url = context.globalState.get('apiUrl');
-
-
-        console.log(apiKey);
-        console.log(typeof(apiKey));
+        const apiKey = context.globalState.get<string>('apiKey');
+        const url = context.globalState.get<string>('apiUrl');
 
         if (!apiKey || !url){
-            throw new Error('Missing OpenAI environment variables.');
+            throw new Error('Missing OpenAI environment variables');
         }
 
         this.apiKey = apiKey;

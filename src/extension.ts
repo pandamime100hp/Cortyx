@@ -4,7 +4,7 @@ import { buildFileTree } from './utilities/file_structure';
 
 
 export async function activate(context: vscode.ExtensionContext) {
-    const commands = [setActivate, setLlm, setApiUrl, setApiToken, getModels, getFileTree]
+    const commands = [setActivate, setLlm, setApiUrl, setApiKey, getModels, getFileTree]
 
     commands.forEach(command => {
         context.subscriptions.push(command(context));
@@ -59,14 +59,14 @@ function setLlm(context: vscode.ExtensionContext): vscode.Disposable {
         const llm: string | undefined = await context.globalState.get('llm');
 
         if (!llm) {
-            const pickLlm = await vscode.window.showQuickPick(
+            const llmValue = await vscode.window.showQuickPick(
                 ['OpenAI', 'Local Model'],
                 {
                     placeHolder: 'Select your preferred LLM provider',
                     canPickMany: false
                 }
             );
-            await context.globalState.update('llm', pickLlm);
+            await context.globalState.update('llm', llmValue);
             vscode.window.showInformationMessage(`LLM provider set to ${llm}`);
         } else {
             vscode.window.showWarningMessage('No LLM selected. The extension may not work correctly.');
@@ -82,12 +82,12 @@ function setApiUrl(context: vscode.ExtensionContext): vscode.Disposable {
         const apiUrl: string | undefined = await context.globalState.get('apiUrl');
 
         if (!apiUrl) {
-            const setApiUrl: string | undefined = await vscode.window.showInputBox({
+            const apiUrlValue: string | undefined = await vscode.window.showInputBox({
                 prompt: 'Enter the API base URL',
                 password: false,
                 value: 'e.g. https://api.openai.com/v1'
             });
-            await context.globalState.update('apiUrl', setApiUrl);
+            await context.globalState.update('apiUrl', apiUrlValue);
             vscode.window.showInformationMessage(`LLM provider API URL set to ${apiUrl}`);
         } else {
             vscode.window.showWarningMessage('No API URL provided. The extension may not work correctly.');
@@ -98,17 +98,17 @@ function setApiUrl(context: vscode.ExtensionContext): vscode.Disposable {
 }
 
 
-function setApiToken(context: vscode.ExtensionContext): vscode.Disposable {
-    const disposable = vscode.commands.registerCommand('cortyx.set_api_token', async () => {
-        const apiToken: string | undefined = await context.globalState.get('apiToken');
+function setApiKey(context: vscode.ExtensionContext): vscode.Disposable {
+    const disposable = vscode.commands.registerCommand('cortyx.set_api_key', async () => {
+        const apiKey: string | undefined = await context.globalState.get('apiKey');
 
-        if (!apiToken) {
-            const setApiToken: string | undefined = await vscode.window.showInputBox({
+        if (!apiKey) {
+            const apiKeyValue: string | undefined = await vscode.window.showInputBox({
                 prompt: 'Enter the API token',
                 password: false,
                 value: '********'
             });
-            await context.globalState.update('apiToken', setApiToken);
+            await context.globalState.update('apiKey', apiKeyValue);
             vscode.window.showInformationMessage('LLM provider API token set');
         } else {
             vscode.window.showWarningMessage('No API token provided. The extension may not work correctly.');
