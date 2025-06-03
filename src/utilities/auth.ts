@@ -1,4 +1,4 @@
-export function getBearerAuthHeader(token: string): HeadersInit {
+export function getBearerAuthHeader(token: string): Record<string, string>{
     return {
         Authorization: `Bearer ${token}`,
     };
