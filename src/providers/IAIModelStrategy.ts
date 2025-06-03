@@ -1,4 +1,7 @@
+import { ChatCompletionOptions } from "./AIModelTypes";
+import { ChatCompletionResponse } from "./openai/OpenAITypes";
+
 export interface IAIModelStrategy {
     // eslint-disable-next-line no-unused-vars
-    generateResponse(prompt: string): Promise<string>;
+    generateResponse(options: ChatCompletionOptions): Promise<ChatCompletionResponse>;
 }

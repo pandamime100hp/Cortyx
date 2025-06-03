@@ -6,6 +6,8 @@ import { parseURL } from '../../utilities/strings';
 import { OpenAIEndpoints } from './OpenAIEndpoints';
 
 import * as vscode from 'vscode'
+import { ChatCompletionOptions } from '../AIModelTypes';
+import { ChatCompletionResponse, OpenAIModelListResponse } from './OpenAITypes';
 
 
 export class OpenAIStrategy implements IAIModelStrategy{
@@ -26,14 +28,35 @@ export class OpenAIStrategy implements IAIModelStrategy{
         this.url = url;
     }
 
-    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-    async generateResponse(prompt: string): Promise<string> {
-        // const completionsEndpoint: string = parseURL(this.url, OpenAIEndpoints.COMPLETIONS);
+    async generateResponse(options: ChatCompletionOptions): Promise<ChatCompletionResponse> {
+        const chatUrl: string = this.url + '/chat'
+        const completionsEndpoint: string = chatUrl + '/' + OpenAIEndpoints.COMPLETIONS;
 
-        throw new Error('Method not implemented.');
+        const response = await fetch(completionsEndpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${this.apiKey}`,
+            },
+            body: JSON.stringify({
+                model: options.model,
+                messages: options.messages,
+                temperature: options.temperature ?? 0.7,
+                max_tokens: options.max_tokens ?? 1024,
+                stream: options.stream ?? false,
+            }),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            throw new Error(`OpenAI API error: ${error}`);
+        }
+
+        const data = await response.json();
+        return data;
     }
 
-    async getModels(): Promise<string>{
+    async getModels(): Promise<OpenAIModelListResponse>{
         const modelsEndpoint: string = parseURL(String(this.url), OpenAIEndpoints.MODELS);
 
         const header = {
@@ -47,8 +70,8 @@ export class OpenAIStrategy implements IAIModelStrategy{
             throw new Error(`OpenAI error: ${response.status} ${error}`);
         }
 
-        const data = await response.json();
+        const models = response.json();
 
-        return data;
+        return models;
     }
 }
