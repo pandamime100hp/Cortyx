@@ -26,6 +26,7 @@ export class OpenAIStrategy implements IAIModelStrategy{
         this.url = url;
     }
 
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
     async generateResponse(prompt: string): Promise<string> {
         // const completionsEndpoint: string = parseURL(this.url, OpenAIEndpoints.COMPLETIONS);
 
