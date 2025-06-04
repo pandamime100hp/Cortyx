@@ -12,8 +12,10 @@ describe('Extension', () => {
         'cortyx.set_llm',
         'cortyx.set_api_url',
         'cortyx.set_api_key',
+        'cortyx.set_llm_model',
         'cortyx.get_models',
-        'cortyx.list_project_files'
+        'cortyx.list_project_files',
+        'cortyx.prompt_ai'
     ];
 
     // Allows us to mock the `console.log` function without having a real instance of it
@@ -169,6 +171,6 @@ describe('Extension', () => {
         await callback();
 
         expect(vscode.mockContext.globalState.update).toHaveBeenCalledWith('apiKey', 'mock-key');
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith('LLM provider API token set');
+        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith('LLM provider API key set');
     });
 });

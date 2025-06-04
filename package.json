@@ -38,8 +38,16 @@
         "title": "Cortyx: Set Base API URL"
       },
       {
-        "command": "cortyx.set_api_token",
-        "title": "Cortyx: Set API Token"
+        "command": "cortyx.set_api_key",
+        "title": "Cortyx: Set API Key"
+      },
+      {
+        "command": "cortyx.set_llm_model",
+        "title": "Cortyx: Set LLM Model"
+      },
+      {
+        "command": "cortyx.prompt_ai",
+        "title": "Cortyx: Prompt AI"
       }
     ]
   },
