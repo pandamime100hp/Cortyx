@@ -59,9 +59,9 @@
     "lint": "eslint",
     "build": "rm -rf out; tsc --build",
     "package": "rm Cortyx-*.vsix; vsce package",
-    "uninstall": "code --uninstall-extension Pandamime100hp.Cortyx",
-    "install": "code --uninstall-extension Pandamime100hp.Cortyx; code --install-extension Cortyx-*.vsix",
-    "install:full": "npm run build; npm run package; npm run install"
+    "uninstall": "if command -v code >/dev/null 2>&1; then code --uninstall-extension Pandamime100hp.Cortyx; fi",
+    "install": "if command -v code >/dev/null 2>&1; then code --install-extension Cortyx-*.vsix; fi",
+    "install:full": "npm run uninstall; npm run build; npm run package; npm run install"
   },
   "repository": {
     "type": "git",
