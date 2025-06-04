@@ -9,7 +9,12 @@ export const window = {
   showErrorMessage: jest.fn(),
   showWarningMessage: jest.fn(),
   showQuickPick: jest.fn(),
-  showInputBox: jest.fn()
+  showInputBox: jest.fn(),
+  createOutputChannel: jest.fn(() => ({
+    clear: jest.fn(),
+    show: jest.fn(),
+    appendLine: jest.fn(),
+  }))
 };
 
 export const workspace = {
