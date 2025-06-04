@@ -1,9 +1,10 @@
 {
-  "name": "cortyx",
+  "name": "Cortyx",
   "version": "0.0.1",
   "description": "Cortyx is a powerful VS Code extension designed to assist developers by offering intelligent code suggestions and insights. By analyzing your project’s codebase, Cortyx provides relevant recommendations, highlights areas for improvement, and helps debug issues — all in real-time.",
   "categories": ["AI", "Programming Languages", "Other"],
   "main": "out/src/extension.js",
+  "publisher": "Pandamime100hp",
   "files": [
     "out",
     "README.md",
@@ -56,8 +57,11 @@
     "test": "npx jest",
     "coverage": "npx jest --coverage",
     "lint": "eslint",
-    "build": "tsc --build",
-    "package": "vsce package"
+    "build": "rm -rf out; tsc --build",
+    "package": "rm Cortyx-*.vsix; vsce package",
+    "uninstall": "code --uninstall-extension Pandamime100hp.Cortyx",
+    "install": "code --uninstall-extension Pandamime100hp.Cortyx; code --install-extension Cortyx-*.vsix",
+    "install:full": "npm run build; npm run package; npm run install"
   },
   "repository": {
     "type": "git",
