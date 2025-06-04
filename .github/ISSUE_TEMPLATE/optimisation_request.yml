@@ -1,6 +1,6 @@
 name: "Optimization Task"
 description: "Improve performance or scalability of the extension"
-title: "[Optimization] <title>"
+title: "[Optimization 🚀]: "
 labels: ["optimization"]
 body:
   - type: textarea

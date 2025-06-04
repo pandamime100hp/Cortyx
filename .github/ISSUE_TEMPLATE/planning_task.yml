@@ -1,6 +1,6 @@
 name: "Planning / Research Task"
 description: "Plan a future implementation or gather information"
-title: "[Planning] <title>"
+title: "[Planning 🧠]: "
 labels: ["planning"]
 body:
   - type: textarea

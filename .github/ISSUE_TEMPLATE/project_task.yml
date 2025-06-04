@@ -1,6 +1,6 @@
 name: "Project Task"
 description: "Track tasks related to project configuration, CI/CD, and other foundational setup."
-title: "[Project] <title>"
+title: "[Project 🗂️]: "
 labels: ["project"]
 body:
   - type: textarea

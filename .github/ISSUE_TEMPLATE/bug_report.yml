@@ -1,6 +1,6 @@
 name: "Bug Report"
 description: "Report something that is broken or not working correctly"
-title: "[Bug] <title>"
+title: "[Bug 🐞]: "
 labels: ["bug"]
 body:
   - type: textarea

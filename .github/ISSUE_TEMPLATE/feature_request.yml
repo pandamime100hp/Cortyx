@@ -1,6 +1,6 @@
 name: "Feature Request"
 description: "Suggest a new feature for the extension"
-title: "[Feature] <title>"
+title: "[Feature 🌟]: "
 labels: ["feature"]
 body:
   - type: textarea
