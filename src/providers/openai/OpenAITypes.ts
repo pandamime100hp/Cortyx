@@ -1,3 +1,5 @@
+//OpenAITypes.ts
+
 import { ChatMessage } from "../AIModelTypes";
 
 export interface OpenAIModel {

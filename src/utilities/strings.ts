@@ -1,3 +1,4 @@
+//strings.ts
 
 export function parseURL(base: string, endpoint: string, queryParams?: Record<string, string | number>): string {
     const baseURL = new URL(base);

@@ -1,26 +1,16 @@
-import { ExtensionContext, Memento } from "vscode";
+//mocks/vscode.ts
 
-export const commands = {
-  registerCommand: jest.fn(),
-};
-  
-export const window = {
-  showInformationMessage: jest.fn(),
-  showErrorMessage: jest.fn(),
-  showWarningMessage: jest.fn(),
-  showQuickPick: jest.fn(),
-  showInputBox: jest.fn(),
-  createOutputChannel: jest.fn(() => ({
+import { ExtensionContext, Memento, OutputChannel } from "vscode";
+
+
+export const mockOutputChannel: OutputChannel = {
+    appendLine: jest.fn(),
     clear: jest.fn(),
     show: jest.fn(),
-    appendLine: jest.fn(),
-  }))
-};
-
-export const workspace = {
-  workspaceFolders: [
-    { uri: { fsPath: '/mock/project/root' } }
-  ]
+    name: '',
+    dispose: jest.fn(),
+    append: jest.fn(),
+    hide: jest.fn()
 };
 
 export const mockGlobalState: ExtensionContext['globalState'] = {
@@ -30,6 +20,12 @@ export const mockGlobalState: ExtensionContext['globalState'] = {
     return undefined;
   }),
   update: jest.fn()
+};
+
+export const ProgressLocation = {
+  SourceControl: 1,
+  Window: 10,
+  Notification: 15
 };
 
 export const mockContext: ExtensionContext = {
@@ -43,4 +39,22 @@ export const mockContext: ExtensionContext = {
   logPath: ''
 }
 
+export const commands = {
+  registerCommand: jest.fn(),
+};
+  
+export const window = {
+  showInformationMessage: jest.fn(),
+  showErrorMessage: jest.fn(),
+  showWarningMessage: jest.fn(),
+  showQuickPick: jest.fn(),
+  showInputBox: jest.fn(),
+  createOutputChannel: jest.fn(() => mockOutputChannel),
+  withProgress: jest.fn(async (_, task) => await task())
+};
 
+export const workspace = {
+  workspaceFolders: [
+    { uri: { fsPath: '/mock/project/root' } }
+  ]
+};

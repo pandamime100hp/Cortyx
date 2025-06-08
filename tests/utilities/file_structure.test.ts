@@ -1,20 +1,16 @@
+//file_structure.test.ts
+
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { getProjectRoot, buildFileTree } from "../../src/utilities/file_structure";
+import { buildFileTree } from "../../src/utilities/file_structure";
 
 jest.mock('fs/promises');
 
 
 describe("File Structure Utility", () => {
-    it("should return the project root", () => {
-        const result = getProjectRoot();
-
-        expect(result).toEqual('/mock/project/root')
-    });
-
     beforeEach(() => {
-    jest.resetAllMocks();
-  });
+      jest.resetAllMocks();
+    });
 
   it('builds a file tree from directory entries', async () => {
     // Mock directory entries: one file and one folder

@@ -1,6 +1,7 @@
+//file_structure.ts
+
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as vscode from 'vscode';
 
 
 export type FileNode = {
@@ -14,37 +15,41 @@ export type FileNode = {
 };
 
 
-const FOLDERS = vscode.workspace.workspaceFolders;
+const IGNORE = [
+    '.git', 'coverage', 'node_modules', 'out'
+]
 
-
-export function getProjectRoot(): string | undefined {
-    if (!FOLDERS || FOLDERS.length === 0) return undefined;
-
-    return FOLDERS[0].uri.fsPath; // Usually the root of the first workspace folder
+function getFileType(name: string): string {
+    const ext = path.extname(name).toLowerCase();
+    return ext ? ext.slice(1) : 'unknown';
 }
 
-
 export async function buildFileTree(dir: string, root: string): Promise<FileNode[]> {
-    const entries = await fs.readdir(dir, { withFileTypes: true });
+    let entries;
+
+    try {
+        entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch (err) {
+        console.error(`Failed to read directory: ${dir}`, err);
+        return [];
+    }
 
     const nodes: FileNode[] = [];
 
     for (const entry of entries) {
+        if (IGNORE.includes(entry.name)) continue;
+
         const fullPath = path.join(dir, entry.name);
         const relativePath = path.relative(root, fullPath);
-
         const isDirectory = entry.isDirectory();
-
-        const fileType = isDirectory
-            ? 'directory'
-            : path.extname(entry.name).replace('.', '').toLowerCase() || 'unknown';
+        const fileType = isDirectory ? 'directory' : getFileType(entry.name);
 
         const node: FileNode = {
-        name: entry.name,
-        path: fullPath,
-        relativePath,
-        isDirectory,
-        fileType
+            name: entry.name,
+            path: fullPath,
+            relativePath,
+            isDirectory,
+            fileType
         };
 
         if (isDirectory) {

@@ -1,3 +1,5 @@
+//OpenAIEndpoints.ts
+
 /* eslint-disable no-unused-vars */
 export enum OpenAIEndpoints {
     MODELS = 'models',
