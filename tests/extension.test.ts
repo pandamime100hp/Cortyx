@@ -1,6 +1,6 @@
 //extension.test.ts
 
-import { activate, deactivate } from '../src/extension';
+import { activate } from '../src/extension';
 import { COMMANDS, GLOBAL_STATE_KEYS } from '../src/constants';
 import { Output } from './mocks/output';
 import { mockContext, mockGlobalState } from './mocks/vscode';
