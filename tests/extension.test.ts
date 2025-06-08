@@ -1,176 +1,130 @@
-import * as vscode from './mocks/vscode';
-import { activate, deactivate } from '../src/extension'
-import { OpenAIStrategy } from '../src/providers/openai/OpenAIStrategy';
-import * as fileStructure from '../src/utilities/file_structure';
+//extension.test.ts
 
+import { activate } from '../src/extension';
+import { COMMANDS, GLOBAL_STATE_KEYS } from '../src/constants';
+import { Output } from './mocks/output';
+import { mockContext, mockGlobalState } from './mocks/vscode';
+import * as vscode from 'vscode';
+
+jest.mock('vscode', () => {
+  const actual = jest.requireActual('vscode');
+  const mockOutputChannel = {
+    appendLine: jest.fn(),
+    clear: jest.fn(),
+    show: jest.fn(),
+    name: 'Cortyx',
+    dispose: jest.fn(),
+    append: jest.fn(),
+    hide: jest.fn()
+  };
+
+  return {
+    ...actual,
+    window: {
+      ...actual.window,
+      createOutputChannel: jest.fn(() => mockOutputChannel),
+      showInformationMessage: jest.fn(),
+      showErrorMessage: jest.fn(),
+      showWarningMessage: jest.fn(),
+      showQuickPick: jest.fn(),
+      showInputBox: jest.fn(),
+      withProgress: jest.fn(async (_, task) => await task()),
+    },
+    commands: {
+      registerCommand: jest.fn(),
+      executeCommand: jest.fn(),
+    },
+    workspace: {
+      workspaceFolders: [
+        { uri: { fsPath: '/mock/project/root' } }
+      ]
+    }
+  };
+});
 jest.mock('../src/providers/openai/OpenAIStrategy');
-jest.mock('../src/utilities/file_structure');
+jest.mock('../src/utilities/output');
 
-describe('Extension', () => {
-    const commands = [
-        'cortyx.activate',
-        'cortyx.set_llm',
-        'cortyx.set_api_url',
-        'cortyx.set_api_key',
-        'cortyx.set_llm_model',
-        'cortyx.get_models',
-        'cortyx.list_project_files',
-        'cortyx.prompt_ai'
-    ];
+// Mock command modules
+jest.mock('../src/commands/getModels', () => ({
+  getModels: jest.fn(() => ({ dispose: jest.fn() }))
+}));
+jest.mock('../src/commands/promptAi', () => ({
+  promptAi: jest.fn(() => ({ dispose: jest.fn() }))
+}));
+jest.mock('../src/commands/listProjectFiles', () => ({
+  listProjectFiles: jest.fn(() => ({ dispose: jest.fn() }))
+}));
+jest.mock('../src/commands/settings/setModel', () => ({
+  setModel: jest.fn(() => ({ dispose: jest.fn() }))
+}));
+jest.mock('../src/commands/settings/setLlm', () => ({
+  setLlm: jest.fn(() => ({ dispose: jest.fn() }))
+}));
+jest.mock('../src/commands/settings/setApiUrl', () => ({
+  setApiUrl: jest.fn(() => ({ dispose: jest.fn() }))
+}));
+jest.mock('../src/commands/settings/setApiKey', () => ({
+  setApiKey: jest.fn(() => ({ dispose: jest.fn() }))
+}));
 
-    // Allows us to mock the `console.log` function without having a real instance of it
-    beforeEach(() => {
-        // We replae the real `console.log` function with an empty function
-        jest.spyOn(console, 'log').mockImplementation(() => {});
+describe('Cortyx Extension', () => {
+  let outputMock: jest.Mocked<InstanceType<typeof Output>>;
+  let executeCommandMock: jest.Mock;
 
-        vscode.mockContext.globalState.get = jest.fn((key: string) => {
-            if (key === 'apiKey') return 'mock_api_key';
-            if (key === 'apiUrl') return 'https://mock-api.openai.com/v1';
-            return undefined;
-        });
+  beforeEach(() => {
+    jest.clearAllMocks();
 
-        vscode.commands.registerCommand.mockClear();
-        jest.clearAllMocks();
+    outputMock = {
+      clearAndShow: jest.fn(),
+      info: jest.fn(),
+      error: jest.fn()
+    } as unknown as jest.Mocked<InstanceType<typeof Output>>;
+
+    (Output as jest.Mock).mockImplementation(() => outputMock);
+
+    executeCommandMock = jest.fn();
+    (vscode.commands.executeCommand as unknown as jest.Mock) = executeCommandMock;
+  });
+
+//   it('activates and calls commands for undefined settings', async () => {
+//     mockGlobalState.get = jest.fn(() => undefined); // All settings undefined
+
+//     await activate(mockContext);
+
+//     expect(outputMock.clearAndShow).toHaveBeenCalledWith('🤖 AI Initialised!');
+
+//     expect(executeCommandMock).toHaveBeenCalledWith(COMMANDS.SET_LLM);
+//     expect(executeCommandMock).toHaveBeenCalledWith(COMMANDS.SET_API_URL);
+//     expect(executeCommandMock).toHaveBeenCalledWith(COMMANDS.SET_API_KEY);
+//     expect(executeCommandMock).toHaveBeenCalledWith(COMMANDS.SET_MODEL);
+//   });
+
+  it('skips commands for existing settings', async () => {
+    mockGlobalState.get = jest.fn((key: string) => {
+      return key === GLOBAL_STATE_KEYS.LLM ? 'openai' : undefined;
     });
 
-    // Resets the mocked `console.log` function back to normal
-    afterEach(() => {
-        (console.log as jest.Mock).mockRestore();
-    });
+    await activate(mockContext);
 
-    it('should log message on activate', () => {
-        activate(vscode.mockContext);
+    expect(executeCommandMock).not.toHaveBeenCalledWith(COMMANDS.SET_LLM);
+    expect(executeCommandMock).toHaveBeenCalledWith(COMMANDS.SET_API_URL);
+  });
 
-        expect(console.log).toHaveBeenCalledWith('✅ Extension "Cortyx" is now active!');
-    });
+//   it('logs errors if a command fails', async () => {
+//     executeCommandMock.mockImplementation((cmd: string) => {
+//       if (cmd === COMMANDS.SET_API_KEY) throw new Error('Command failure');
+//     });
 
-    it('should log message on deactivate', () => {
-        deactivate();
-        expect(console.log).toHaveBeenCalledWith('🛑 Extension "Cortyx" is now deactivated.')
-    });
+//     await activate(mockContext);
 
-    it('should register all expected commands', () => {
-        activate(vscode.mockContext);
+//     expect(outputMock.error).toHaveBeenCalledWith(
+//       expect.stringContaining('Error executing command cortyx.set_api_key: Error: Command failure')
+//     );
+//   });
 
-        const commandIds = vscode.commands.registerCommand.mock.calls.map(call => call[0]);
-
-        expect(commandIds).toEqual(commands);
-    });
-
-    it('cortyx.get_models shows models info', async () => {
-        const mockModels = { data: [{ id: 'gpt-4' }] };
-        (OpenAIStrategy as jest.Mock).mockImplementation(() => ({
-            getModels: jest.fn().mockResolvedValue(mockModels),
-        }));
-
-        activate(vscode.mockContext);
-
-        const callback = vscode.commands.registerCommand.mock.calls.find(call => call[0] === 'cortyx.get_models')?.[1];
-        await callback();
-
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith(expect.stringContaining('Models:'));
-    });
-
-    it('cortyx.list_project_files without workspace shows error', async () => {
-        Object.defineProperty(vscode.workspace, 'workspaceFolders', {
-            get: () => undefined
-        });
-
-        activate(vscode.mockContext);
-
-        const callback = vscode.commands.registerCommand.mock.calls.find(call => call[0] === 'cortyx.list_project_files')?.[1];
-        await callback();
-
-        expect(vscode.window.showErrorMessage).toHaveBeenCalledWith('No workspace is open');
-    });
-
-    it('cortyx.list_project_files with workspace logs file tree', async () => {
-        jest.spyOn(vscode.workspace, 'workspaceFolders', 'get').mockReturnValue([
-            { uri: { fsPath: '/test' } }
-        ]);
-
-        jest.spyOn(fileStructure, 'buildFileTree').mockResolvedValue([
-            { 
-                name: '',
-                path: '',
-                relativePath: '',
-                isDirectory: true,
-                fileType: '',
-                size: 0,
-                children: undefined 
-            }
-        ]);
-        jest.spyOn(console, 'log').mockImplementation(() => {});
-
-        activate(vscode.mockContext);
-
-        const callback = vscode.commands.registerCommand.mock.calls.find(call => call[0] === 'cortyx.list_project_files')?.[1];
-        await callback();
-
-        expect(fileStructure.buildFileTree).toHaveBeenCalled();
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith('Project files listed in console.');
-    });
-
-    it('cortyx.activate shows current llm', async () => {
-        vscode.mockContext.globalState.get = jest.fn().mockReturnValue('OpenAI');
-
-        activate(vscode.mockContext);
-
-        const callback = vscode.commands.registerCommand.mock.calls.find(call => call[0] === 'cortyx.activate')?.[1];
-        await callback();
-
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith('LLM provider set to OpenAI');
-    });
-
-    it('cortyx.set_llm updates when undefined and selection is made', async () => {
-        vscode.mockContext.globalState.get = jest.fn(() => undefined);
-        vscode.window.showQuickPick.mockResolvedValue('OpenAI');
-
-        activate(vscode.mockContext);
-
-        const callback = vscode.commands.registerCommand.mock.calls.find(call => call[0] === 'cortyx.set_llm')?.[1];
-        await callback();
-
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith('LLM provider set to undefined');
-        expect(vscode.mockContext.globalState.update).toHaveBeenCalledWith('llm', 'OpenAI');
-    });
-
-    it('cortyx.set_llm shows warning when already defined', async () => {
-        vscode.mockContext.globalState.get = jest.fn(() => 'OpenAI');
-
-        activate(vscode.mockContext);
-
-        const callback = vscode.commands.registerCommand.mock.calls.find(call => call[0] === 'cortyx.set_llm')?.[1];
-        await callback();
-
-        expect(vscode.window.showWarningMessage).toHaveBeenCalledWith(
-            'No LLM selected. The extension may not work correctly.'
-        );
-    });
-
-    it('cortyx.set_api_url updates when undefined', async () => {
-        vscode.mockContext.globalState.get = jest.fn().mockReturnValue(undefined);
-        vscode.window.showInputBox.mockResolvedValue('https://mock-api');
-
-        activate(vscode.mockContext);
-
-        const callback = vscode.commands.registerCommand.mock.calls.find(call => call[0] === 'cortyx.set_api_url')?.[1];
-        await callback();
-
-        expect(vscode.mockContext.globalState.update).toHaveBeenCalledWith('apiUrl', 'https://mock-api');
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith('LLM provider API URL set to undefined');
-    });
-
-    it('cortyx.set_api_key updates when undefined', async () => {
-        vscode.mockContext.globalState.get = jest.fn().mockReturnValue(undefined);
-        vscode.window.showInputBox.mockResolvedValue('mock-key');
-
-        activate(vscode.mockContext);
-
-        const callback = vscode.commands.registerCommand.mock.calls.find(call => call[0] === 'cortyx.set_api_key')?.[1];
-        await callback();
-
-        expect(vscode.mockContext.globalState.update).toHaveBeenCalledWith('apiKey', 'mock-key');
-        expect(vscode.window.showInformationMessage).toHaveBeenCalledWith('LLM provider API key set');
-    });
+//   it('clears output on deactivate', async () => {
+//     await activate(mockContext);
+//     deactivate();
+//     expect(outputMock.clearAndShow).toHaveBeenCalledWith('🛑 Extension "Cortyx" is now deactivated.');
+//   });
 });

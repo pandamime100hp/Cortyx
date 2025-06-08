@@ -1,10 +1,9 @@
-import { IAIModelStrategy } from '../IAIModelStrategy';
+//OpenAIStrategy.ts
 
+import { IAIModelStrategy } from '../IAIModelStrategy';
 import { getBearerAuthHeader } from '../../utilities/auth';
 import { parseURL } from '../../utilities/strings';
-
 import { OpenAIEndpoints } from './OpenAIEndpoints';
-
 import * as vscode from 'vscode'
 import { ChatCompletionOptions } from '../AIModelTypes';
 import { ChatCompletionResponse, OpenAIModelListResponse } from './OpenAITypes';
@@ -20,8 +19,8 @@ export class OpenAIStrategy implements IAIModelStrategy{
         const apiKey = context.globalState.get<string>('apiKey');
         const url = context.globalState.get<string>('apiUrl');
 
-        if (!apiKey || !url){
-            throw new Error('Missing OpenAI environment variables');
+        if (!apiKey || !url) {
+            throw new Error(`Missing OpenAI configuration: ${!apiKey ? 'API Key' : ''} ${!url ? 'URL' : ''}`.trim());
         }
 
         this.apiKey = apiKey;
@@ -56,22 +55,21 @@ export class OpenAIStrategy implements IAIModelStrategy{
         return data;
     }
 
-    async getModels(): Promise<OpenAIModelListResponse>{
-        const modelsEndpoint: string = parseURL(String(this.url), OpenAIEndpoints.MODELS);
+    async getModels(): Promise<OpenAIModelListResponse> {
+        const modelsEndpoint = parseURL(String(this.url), OpenAIEndpoints.MODELS);
+        const headers = getBearerAuthHeader(this.apiKey);
 
-        const header = {
-            headers: getBearerAuthHeader(String(this.apiKey))
-        };
+        try {
+            const response = await fetch(modelsEndpoint, { headers });
 
-        const response = await fetch(modelsEndpoint, header)
+            if (!response.ok) {
+                const error = await response.text();
+                throw new Error(`OpenAI error: ${response.status} ${error}`);
+            }
 
-        if (!response.ok){
-            const error = await response.text();
-            throw new Error(`OpenAI error: ${response.status} ${error}`);
+            return await response.json();
+        } catch (err) {
+            throw new Error(`Failed to fetch models from OpenAI: ${(err as Error).message}`);
         }
-
-        const models = response.json();
-
-        return models;
     }
 }
