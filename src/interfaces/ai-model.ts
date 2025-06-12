@@ -4,12 +4,12 @@ import {
     ChatCompletionOptions, 
     ChatCompletionResponse,
     LLMModelListResponse, 
-} from "./types";
+} from "../types/chat";
 
 /**
  * Defines the interface for an AI model strategy.
  */
-export interface AIModelStrategy {
+export interface IAIModelStrategy {
     readonly name: string;
 
     /**

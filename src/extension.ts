@@ -1,12 +1,8 @@
-//extension.ts
-
-import { 
-    ExtensionContext 
-} from 'vscode';
-import { CommandRegistry } from './commands/command-registry';
+import { ExtensionContext } from 'vscode';
+import { CommandRegistry } from './registry/command-registry';
 import { Configuration } from './configuration/configuration';
 import { Output } from './utilities/output.utility';
-import { AIModelContext } from './providers/context.providers';
+import { AIModelContext } from './context/ai-model-context';
 
 // Holds the active command registry for cleanup on extension deactivation
 let commandRegistry: CommandRegistry;

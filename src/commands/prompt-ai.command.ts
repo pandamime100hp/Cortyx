@@ -1,10 +1,17 @@
-// //promptAi.ts
+import { Disposable } from "vscode";
+import { IExtensionCommand } from "../interfaces/command";
 
-// import * as vscode from 'vscode';
-// import { ChatCompletionOptions } from '../providers/types';
-// import { COMMAND, GLOBAL_STATE_KEYS } from '../utilities/constants';
-// import { Output } from '../utilities/output';
-// import { OpenAIStrategy } from '../providers/openai/OpenAIStrategy';
+export class PromptAI implements IExtensionCommand {
+    readonly id: string = 'cortyx.promptAI';
+
+    register(): Disposable {
+        throw new Error("Method not implemented.");
+    }
+    execute(...args: unknown[]): Promise<void> {
+        throw new Error("Method not implemented.");
+    }
+    
+}
 
 
 // export function promptAi(context: vscode.ExtensionContext, strategy: OpenAIStrategy, output: Output) {
