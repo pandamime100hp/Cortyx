@@ -3,7 +3,9 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
-
+/**
+ * 
+ */
 export type FileNode = {
     name: string;
     path: string;
@@ -14,16 +16,29 @@ export type FileNode = {
     children?: FileNode[];
 };
 
-
+/**
+ * 
+ */
 const IGNORE = [
     '.git', 'coverage', 'node_modules', 'out'
 ]
 
+/**
+ * 
+ * @param name 
+ * @returns 
+ */
 function getFileType(name: string): string {
     const ext = path.extname(name).toLowerCase();
     return ext ? ext.slice(1) : 'unknown';
 }
 
+/**
+ * 
+ * @param dir 
+ * @param root 
+ * @returns 
+ */
 export async function buildFileTree(dir: string, root: string): Promise<FileNode[]> {
     let entries;
 
