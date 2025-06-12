@@ -1,8 +1,12 @@
 {
-  "name": "Cortyx",
+  "name": "cortyx",
   "version": "0.0.1",
   "description": "Cortyx is a powerful VS Code extension designed to assist developers by offering intelligent code suggestions and insights. By analyzing your project’s codebase, Cortyx provides relevant recommendations, highlights areas for improvement, and helps debug issues — all in real-time.",
-  "categories": ["AI", "Programming Languages", "Other"],
+  "categories": [
+    "AI",
+    "Programming Languages",
+    "Other"
+  ],
   "main": "out/src/extension.js",
   "publisher": "Pandamime100hp",
   "files": [
@@ -13,44 +17,16 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "engines": {
-    "vscode": "^1.99.0"
-  },
   "contributes": {
     "commands": [
       {
-        "command": "cortyx.activate",
-        "title": "Cortyx: Activate"
-      },
-      {
-        "command": "cortyx.get_models",
-        "title": "Cortyx: List Available Models"
-      },
-      {
-        "command": "cortyx.list_project_files",
-        "title": "Cortyx: List Project Files"
-      },
-      {
-        "command": "cortyx.set_llm",
-        "title": "Cortyx: Set LLM"
-      },
-      {
-        "command": "cortyx.set_api_url",
-        "title": "Cortyx: Set Base API URL"
-      },
-      {
-        "command": "cortyx.set_api_key",
-        "title": "Cortyx: Set API Key"
-      },
-      {
-        "command": "cortyx.set_llm_model",
-        "title": "Cortyx: Set LLM Model"
-      },
-      {
-        "command": "cortyx.prompt_ai",
-        "title": "Cortyx: Prompt AI"
+        "command": "cortyx.getLlmModels",
+        "title": "Cortyx: Get LLM Models"
       }
     ]
+  },
+  "engines": {
+    "vscode": "^1.100.0"
   },
   "type": "commonjs",
   "scripts": {
@@ -58,9 +34,9 @@
     "coverage": "npx jest --coverage",
     "lint": "eslint",
     "build": "rm -rf out; tsc --build",
-    "package": "rm Cortyx-*.vsix; vsce package",
+    "package": "rm cortyx-*.vsix; vsce package",
     "uninstall": "if command -v code >/dev/null 2>&1; then code --uninstall-extension Pandamime100hp.Cortyx; fi",
-    "install": "if command -v code >/dev/null 2>&1; then code --install-extension Cortyx-*.vsix; fi",
+    "install": "if command -v code >/dev/null 2>&1; then code --install-extension cortyx-*.vsix; fi",
     "install:full": "npm run uninstall; npm run build; npm run package; npm run install"
   },
   "repository": {
@@ -76,12 +52,14 @@
   "devDependencies": {
     "@eslint/js": "^9.25.1",
     "@types/jest": "^29.5.14",
+    "@types/vscode": "^1.100.0",
     "dotenv": "^16.5.0",
     "eslint": "^9.25.1",
     "globals": "^16.0.0",
     "ts-jest": "^29.3.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.31.0",
-    "vscode": "^1.1.34"
+    "vscode-test": "^1.6.1"
   }
 }
