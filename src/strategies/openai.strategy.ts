@@ -1,27 +1,23 @@
 // openai/strategy.openai.ts
 
-import { AIModelStrategy } from '../../ai-model-strategy.providers';
-import { getBearerAuthHeader } from '../../../utilities/auth.utility';
-import { parseURL } from '../../../utilities/strings.utility';
-import { OpenAIEndpoints } from './endpoints.openai';
+import { IAIModelStrategy } from '../interfaces/ai-model';
+import { getBearerAuthHeader } from '../utilities/auth.utility';
 import { ExtensionContext } from 'vscode'
 import { 
     ChatCompletionOptions, 
     LLMModelListResponse, 
     ChatCompletionResponse 
-} from '../../types';
-import { OpenAIModelListResponse } from './types.openai';
-import { Output } from '../../../utilities/output.utility';
+} from '../types/chat';
+import { OpenAIModelListResponse } from '../types/openai';
+import { Output } from '../utilities/output.utility';
 
 
-export class OpenAIStrategy implements AIModelStrategy{
+export class OpenAIStrategy implements IAIModelStrategy{
     // https://platform.openai.com/docs/api-reference/introduction
 
     private readonly output: Output;
-
     private readonly apiKey: string;
     private readonly url: string;
-
     readonly name: string = 'OpenAI';
 
     /**
@@ -55,7 +51,7 @@ export class OpenAIStrategy implements AIModelStrategy{
      */
     async promptAi(options: ChatCompletionOptions): Promise<ChatCompletionResponse> {
         const METHOD: string = 'POST';
-        const completionsEndpoint = new URL(`/chat/${OpenAIEndpoints.COMPLETIONS}`, this.url).toString();
+        const completionsEndpoint = new URL('/chat/completions', this.url).toString();
 
         this.output.info(`Executing ${METHOD} ${completionsEndpoint}`);
 
@@ -104,7 +100,7 @@ export class OpenAIStrategy implements AIModelStrategy{
      */
     async getLlmModels(): Promise<LLMModelListResponse> {
         const METHOD: string = 'GET';
-        const modelsEndpoint: string = parseURL(String(this.url), OpenAIEndpoints.MODELS);
+        const modelsEndpoint = new URL('/models', this.url).toString();
         const headers: Record<string, string> = getBearerAuthHeader(this.apiKey);
 
         this.output.info(`Executing ${METHOD} ${modelsEndpoint}`);

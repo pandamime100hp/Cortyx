@@ -4,18 +4,18 @@ import {
     ExtensionContext, 
     Disposable
 } from 'vscode';
-import { ExtensionCommand } from './types';
+import { IExtensionCommand } from '../interfaces/command';
 import { Output } from '../utilities/output.utility';
-import { AIModelContext } from '../providers/context.providers';
-import { CommandStrategy } from './strategies/command.strategy';
-import { OpenAICommandStrategy } from '../providers/strategies/openai/commands.openai';
+import { AIModelContext } from '../context/ai-model-context';
+import { CommandStrategy } from '../strategies/command.strategy';
+import { OpenAICommandStrategy } from '../strategies/openai-command.strategy';
 
 
 export class CommandRegistry {
     private readonly output: Output;
     private readonly context: ExtensionContext;
     private disposables: Disposable[] = [];
-    private commands: ExtensionCommand[] = []
+    private commands: IExtensionCommand[] = []
 
     /**
      * Initialises the available commands found as `*.command.ts` under the `commands` folder. 

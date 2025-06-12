@@ -6,15 +6,15 @@ import {
     LLM_PROVIDER,
     LLM_API_URL,
     LLM_API_KEY
-} from '../utilities/constants.utility';
+} from '../constants/constant';
 import { 
     showInputBox, 
     showQuickPick 
 } from '../utilities/input-helpers.utility';
-import { OpenAIStrategy } from "../providers/strategies/openai/strategy.openai";
-import { AIModelStrategy } from "../providers/ai-model-strategy.providers";
+import { OpenAIStrategy } from "../strategies/openai.strategy";
+import { IAIModelStrategy } from "../interfaces/ai-model";
 import { Output } from "../utilities/output.utility";
-import { AIModelContext } from "../providers/context.providers";
+import { AIModelContext } from "../context/ai-model-context";
 
 
 export class Configuration{
@@ -24,7 +24,7 @@ export class Configuration{
     provider: string | undefined;
     url: string | undefined;
 
-    private models: { [key: string]: new (context: ExtensionContext) => AIModelStrategy } = {
+    private models: { [key: string]: new (context: ExtensionContext) => IAIModelStrategy } = {
         OpenAI: OpenAIStrategy,
         // Ollama: OllamaStrategy
     };

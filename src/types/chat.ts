@@ -1,6 +1,11 @@
-//providers/types.ts
+/**
+ * 
+ */
 
-export interface ChatCompletionResponse {
+/**
+ * 
+ */
+export type ChatCompletionResponse = {
   // Unique identifier of the response
   id: string;
 
@@ -24,7 +29,10 @@ export interface ChatCompletionResponse {
   };
 }
 
-export interface ChatMessage {
+/**
+ * 
+ */
+export type ChatMessage = {
   // Who sent this message (e.g. 'system', 'user', 'assistant')
   role: 'system' | 'user' | 'assistant';
 
@@ -32,7 +40,10 @@ export interface ChatMessage {
   content: string;
 }
 
-export interface ChatCompletionChoice {
+/**
+ * 
+ */
+export type ChatCompletionChoice = {
   // Index of this choice in the response (usually 0-based)
   index: number;
 
@@ -43,7 +54,10 @@ export interface ChatCompletionChoice {
   finish_reason?: string;
 }
 
-export interface ChatCompletionOptions {
+/**
+ * 
+ */
+export type ChatCompletionOptions = {
   // Model to use for completion
   model: string;
 
@@ -60,7 +74,10 @@ export interface ChatCompletionOptions {
   stream?: boolean;
 }
 
-export interface LLMModelListResponse {
+/**
+ * 
+ */
+export type LLMModelListResponse = {
   // List of available model IDs/names
   models: string[],
 }

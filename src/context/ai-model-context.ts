@@ -1,24 +1,24 @@
 //providers/context.providers.ts
 
 import { Output } from "../utilities/output.utility";
-import { AIModelStrategy } from "./ai-model-strategy.providers";
+import { IAIModelStrategy } from "../interfaces/ai-model";
 import { 
     ChatCompletionOptions, 
     ChatCompletionResponse, 
     LLMModelListResponse 
-} from "./types";
+} from "../types/chat";
 
 
 
 export class AIModelContext {
     private readonly output: Output;
-    private strategy: AIModelStrategy;
+    private strategy: IAIModelStrategy;
 
     /**
      * 
      * @param strategy 
      */
-    constructor(strategy: AIModelStrategy){
+    constructor(strategy: IAIModelStrategy){
         this.output = Output.getInstance();
         this.strategy = strategy;
     }
@@ -27,7 +27,7 @@ export class AIModelContext {
      * 
      * @param strategy 
      */
-    setStrategy(strategy: AIModelStrategy){
+    setStrategy(strategy: IAIModelStrategy){
         this.strategy = strategy;
     }
 
