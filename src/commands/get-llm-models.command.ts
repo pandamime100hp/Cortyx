@@ -10,13 +10,13 @@ import { ICommand } from '../interfaces/command';
 import { LLMModelListResponse } from '../types/chat';
 import { Output } from '../utilities/output.utility';
 import { AIModelContext } from '../context/ai-model-context';
+import { GLOBAL_STATE_KEYS } from '../constants/constants';
 
 
 export class GetLLMModels implements ICommand{
-    private readonly output: Output;
+    private readonly output: Output = Output.getInstance();
     private readonly strategy: AIModelContext;
     private context: ExtensionContext;
-    private readonly GLOBAL_STATE_KEY: string = 'llm';
     readonly id: string = 'cortyx.getLlmModels';
 
     /**
@@ -25,7 +25,6 @@ export class GetLLMModels implements ICommand{
      * @param strategy 
      */
     constructor(context: ExtensionContext, strategy: AIModelContext) {
-        this.output = Output.getInstance();
         this.context = context;
         this.strategy = strategy;
     }
@@ -59,7 +58,7 @@ export class GetLLMModels implements ICommand{
         }
 
         if (models) {
-            await this.context.globalState.update(this.GLOBAL_STATE_KEY, models.models)
+            await this.context.globalState.update(GLOBAL_STATE_KEYS.MODELS, models.models)
             window.showInformationMessage(`Models: ${models.models.length}`);
         } else {
             this.output.warn('No models returned from the provider');

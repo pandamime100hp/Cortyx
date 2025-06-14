@@ -1,7 +1,6 @@
 // command-registry.ts
 
 import { 
-    commands,
     Disposable,
     ExtensionContext
 } from 'vscode';
@@ -10,11 +9,13 @@ import { Output } from '../utilities/output.utility';
 import { AIModelContext } from '../context/ai-model-context';
 import { ICommandStrategy } from '../interfaces/command-strategy';
 import { OpenAICommandStrategy } from '../strategies/openai-command.strategy';
+import { GlobalCommandStrategy } from '../strategies/global-command.strategy';
 
 
 export class CommandRegistry {
-    private readonly output: Output;
+    private readonly output: Output = Output.getInstance();
     private readonly context: ExtensionContext;
+    private readonly provider: AIModelContext;
     private disposables: Disposable[] = [];
     private commands: ICommand[] = []
 
@@ -25,26 +26,30 @@ export class CommandRegistry {
      * @param context 
      * @param strategy 
      */
-    constructor(context: ExtensionContext) {
-        this.output = Output.getInstance();
+    constructor(context: ExtensionContext, provider: AIModelContext) {
         this.context = context;
+        this.provider = provider;
         this.output.info('Command Registry initialised')
     }
 
-    async getCommands(model: AIModelContext) {
-        this.output.info('Setting command strategy');
+    async getCommands() {
+        this.output.info('Getting commands');
+        const globalCommands: GlobalCommandStrategy = new GlobalCommandStrategy(this.context, this.provider);
+        globalCommands.getCommands().forEach(command => {
+            this.commands.push(command);
+        });
+
         let commandStrategy: ICommandStrategy;
-        const provider = model.getProviderName();
-        await commands.executeCommand('setContext', 'cortyx.provider', provider);
-        switch (provider) {
+
+        switch (this.provider.getProviderName()) {
             case 'OpenAI':
-                commandStrategy = new OpenAICommandStrategy(this.context, model);
+                commandStrategy = new OpenAICommandStrategy(this.context, this.provider);
                 break;
             default:
                 throw new Error('No command strategy found for this provider');
         }
 
-        commandStrategy.getCommands(this.context, model).forEach(command => {
+        commandStrategy.getCommands().forEach(command => {
             this.commands.push(command);
         });
     }

@@ -19,20 +19,21 @@
     "onStartupFinished"
   ],
   "contributes": {
-    "commands": [
-      {
+    "commands": [{
         "command": "cortyx.getLlmModels",
         "title": "Cortyx: Get LLM Models"
-      },
-      {
+      }, {
+        "command": "cortyx.setLlmModel",
+        "title": "Cortyx: Set LLM Model"
+      }, {
+        "command": "cortyx.setApiUrl",
+        "title": "Cortyx: Set API URL"
+      }, {
+        "command": "cortyx.promptAi",
+        "title": "Cortyx: Prompt Enabled AI"
+      }, {
         "command": "cortyx.setOpenAiApiKey",
         "title": "Cortyx: OpenAI Set API Key",
-        "category": "OpenAI",
-        "enablement": "cortyx.provider == 'OpenAI'"
-      },
-      {
-        "command": "cortyx.setOpenAiApiUrl",
-        "title": "Cortyx: OpenAI Set API URL",
         "category": "OpenAI",
         "enablement": "cortyx.provider == 'OpenAI'"
       }
