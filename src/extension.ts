@@ -23,7 +23,7 @@ export async function activate(context: ExtensionContext) {
 
     commandRegistry = new CommandRegistry(context);
 
-    commandRegistry.getCommands(model);
+    await commandRegistry.getCommands(model);
     commandRegistry.registerAll();
 
     output.info('Cortyx AI initialised');

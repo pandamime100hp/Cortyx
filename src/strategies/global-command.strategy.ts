@@ -1,18 +1,18 @@
-import { CommandStrategy } from './command.strategy';
-import { IExtensionCommand } from '../interfaces/command';
+import { ICommandStrategy } from '../interfaces/command-strategy';
+import { ICommand } from '../interfaces/command';
 import { ExtensionContext } from 'vscode';
+import { SetAPIURL } from '../commands/set-api-url.command';
 
-export class GlobalCommandStrategy implements CommandStrategy {
+export class GlobalCommandStrategy implements ICommandStrategy {
     private context: ExtensionContext;
 
     constructor(context: ExtensionContext) {
         this.context = context;
     }
 
-    getCommands(): IExtensionCommand[] {
+    getCommands(): ICommand[] {
         return [
-            // new SetProvider(context),
-            // new SetURL(context),
+            new SetAPIURL(this.context),
         ];
     }
 }

@@ -1,7 +1,7 @@
 import { Disposable } from "vscode";
-import { IExtensionCommand } from "../interfaces/command";
+import { ICommand } from "../interfaces/command";
 
-export class PromptAI implements IExtensionCommand {
+export class PromptAI implements ICommand {
     readonly id: string = 'cortyx.promptAI';
 
     register(): Disposable {

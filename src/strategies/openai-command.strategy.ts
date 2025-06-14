@@ -1,10 +1,11 @@
 import { ExtensionContext } from "vscode";
-import { CommandStrategy } from "./command.strategy";
+import { ICommandStrategy } from "../interfaces/command-strategy";
 import { AIModelContext } from "../context/ai-model-context";
+import { ICommand } from "../interfaces/command";
 import { GetLLMModels } from "../commands/get-llm-models.command";
-import { IExtensionCommand } from "../interfaces/command";
+import { SetOpenAIAPIKey } from "../commands/openai/set-openai-api-key.command";
 
-export class OpenAICommandStrategy implements CommandStrategy {
+export class OpenAICommandStrategy implements ICommandStrategy {
     private context: ExtensionContext;
     private model: AIModelContext;
 
@@ -13,8 +14,9 @@ export class OpenAICommandStrategy implements CommandStrategy {
         this.model = model;
     }
 
-    getCommands(): IExtensionCommand[] {
+    getCommands(): ICommand[] {
         return [
+            new SetOpenAIAPIKey(this.context),
             new GetLLMModels(this.context, this.model),
         ];
     }

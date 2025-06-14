@@ -32,7 +32,7 @@ export class AIModelContext {
     }
 
     /**
-     * 
+     * @returns Name of the strategy used.
      */
     getProviderName(): string {
         return this.strategy.name;

@@ -1,13 +1,14 @@
 // command-registry.ts
 
 import { 
-    ExtensionContext, 
-    Disposable
+    commands,
+    Disposable,
+    ExtensionContext
 } from 'vscode';
-import { IExtensionCommand } from '../interfaces/command';
+import { ICommand } from '../interfaces/command';
 import { Output } from '../utilities/output.utility';
 import { AIModelContext } from '../context/ai-model-context';
-import { CommandStrategy } from '../strategies/command.strategy';
+import { ICommandStrategy } from '../interfaces/command-strategy';
 import { OpenAICommandStrategy } from '../strategies/openai-command.strategy';
 
 
@@ -15,7 +16,7 @@ export class CommandRegistry {
     private readonly output: Output;
     private readonly context: ExtensionContext;
     private disposables: Disposable[] = [];
-    private commands: IExtensionCommand[] = []
+    private commands: ICommand[] = []
 
     /**
      * Initialises the available commands found as `*.command.ts` under the `commands` folder. 
@@ -30,10 +31,12 @@ export class CommandRegistry {
         this.output.info('Command Registry initialised')
     }
 
-    getCommands(model: AIModelContext) {
+    async getCommands(model: AIModelContext) {
         this.output.info('Setting command strategy');
-        let commandStrategy: CommandStrategy;
-        switch (model.getProviderName()) {
+        let commandStrategy: ICommandStrategy;
+        const provider = model.getProviderName();
+        await commands.executeCommand('setContext', 'cortyx.provider', provider);
+        switch (provider) {
             case 'OpenAI':
                 commandStrategy = new OpenAICommandStrategy(this.context, model);
                 break;
@@ -62,9 +65,11 @@ export class CommandRegistry {
      * Registers all provided commands with VSCode. If a new strategy is set, you must 
      * reregister the commands by calling `registerCommands`.
      */
-    registerAll(): void {
+    registerAll(providerCommands: ICommand[] = []): void {
         this.output.info(`Registering all commands`)
         this.disposeCommands();
+
+        this.commands.concat(providerCommands);
 
         for (const command of this.commands) {
             try {

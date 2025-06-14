@@ -6,13 +6,13 @@ import {
     ExtensionContext, 
     window 
 } from 'vscode';
-import { IExtensionCommand } from '../interfaces/command';
+import { ICommand } from '../interfaces/command';
 import { LLMModelListResponse } from '../types/chat';
 import { Output } from '../utilities/output.utility';
 import { AIModelContext } from '../context/ai-model-context';
 
 
-export class GetLLMModels implements IExtensionCommand{
+export class GetLLMModels implements ICommand{
     private readonly output: Output;
     private readonly strategy: AIModelContext;
     private context: ExtensionContext;
@@ -47,6 +47,8 @@ export class GetLLMModels implements IExtensionCommand{
      */
     async execute(...args: unknown[]): Promise<void> {
         let models: LLMModelListResponse | undefined = undefined;
+
+        this.output.info(`Executing ${this.strategy.getProviderName()} getLlmModels`);
 
         try{
             models = await this.strategy.getLlmModels();

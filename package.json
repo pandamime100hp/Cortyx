@@ -1,5 +1,6 @@
 {
   "name": "cortyx",
+  "displayName": "Cortyx",
   "version": "0.0.1",
   "description": "Cortyx is a powerful VS Code extension designed to assist developers by offering intelligent code suggestions and insights. By analyzing your project’s codebase, Cortyx provides relevant recommendations, highlights areas for improvement, and helps debug issues — all in real-time.",
   "categories": [
@@ -8,7 +9,7 @@
     "Other"
   ],
   "main": "out/src/extension.js",
-  "publisher": "Pandamime100hp",
+  "publisher": "PandamimeLabs",
   "files": [
     "out",
     "README.md",
@@ -22,6 +23,18 @@
       {
         "command": "cortyx.getLlmModels",
         "title": "Cortyx: Get LLM Models"
+      },
+      {
+        "command": "cortyx.setOpenAiApiKey",
+        "title": "Cortyx: OpenAI Set API Key",
+        "category": "OpenAI",
+        "enablement": "cortyx.provider == 'OpenAI'"
+      },
+      {
+        "command": "cortyx.setOpenAiApiUrl",
+        "title": "Cortyx: OpenAI Set API URL",
+        "category": "OpenAI",
+        "enablement": "cortyx.provider == 'OpenAI'"
       }
     ]
   },
