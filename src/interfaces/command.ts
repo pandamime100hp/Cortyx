@@ -1,6 +1,6 @@
 import { Disposable } from "vscode";
 
-export interface IExtensionCommand {
+export interface ICommand {
   readonly id: string;
 
   /**

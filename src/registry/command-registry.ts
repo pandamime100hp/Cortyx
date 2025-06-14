@@ -1,21 +1,23 @@
 // command-registry.ts
 
 import { 
-    ExtensionContext, 
-    Disposable
+    Disposable,
+    ExtensionContext
 } from 'vscode';
-import { IExtensionCommand } from '../interfaces/command';
+import { ICommand } from '../interfaces/command';
 import { Output } from '../utilities/output.utility';
 import { AIModelContext } from '../context/ai-model-context';
-import { CommandStrategy } from '../strategies/command.strategy';
+import { ICommandStrategy } from '../interfaces/command-strategy';
 import { OpenAICommandStrategy } from '../strategies/openai-command.strategy';
+import { GlobalCommandStrategy } from '../strategies/global-command.strategy';
 
 
 export class CommandRegistry {
-    private readonly output: Output;
+    private readonly output: Output = Output.getInstance();
     private readonly context: ExtensionContext;
+    private readonly provider: AIModelContext;
     private disposables: Disposable[] = [];
-    private commands: IExtensionCommand[] = []
+    private commands: ICommand[] = []
 
     /**
      * Initialises the available commands found as `*.command.ts` under the `commands` folder. 
@@ -24,24 +26,30 @@ export class CommandRegistry {
      * @param context 
      * @param strategy 
      */
-    constructor(context: ExtensionContext) {
-        this.output = Output.getInstance();
+    constructor(context: ExtensionContext, provider: AIModelContext) {
         this.context = context;
+        this.provider = provider;
         this.output.info('Command Registry initialised')
     }
 
-    getCommands(model: AIModelContext) {
-        this.output.info('Setting command strategy');
-        let commandStrategy: CommandStrategy;
-        switch (model.getProviderName()) {
+    async getCommands() {
+        this.output.info('Getting commands');
+        const globalCommands: GlobalCommandStrategy = new GlobalCommandStrategy(this.context, this.provider);
+        globalCommands.getCommands().forEach(command => {
+            this.commands.push(command);
+        });
+
+        let commandStrategy: ICommandStrategy;
+
+        switch (this.provider.getProviderName()) {
             case 'OpenAI':
-                commandStrategy = new OpenAICommandStrategy(this.context, model);
+                commandStrategy = new OpenAICommandStrategy(this.context, this.provider);
                 break;
             default:
                 throw new Error('No command strategy found for this provider');
         }
 
-        commandStrategy.getCommands(this.context, model).forEach(command => {
+        commandStrategy.getCommands().forEach(command => {
             this.commands.push(command);
         });
     }
@@ -62,9 +70,11 @@ export class CommandRegistry {
      * Registers all provided commands with VSCode. If a new strategy is set, you must 
      * reregister the commands by calling `registerCommands`.
      */
-    registerAll(): void {
+    registerAll(providerCommands: ICommand[] = []): void {
         this.output.info(`Registering all commands`)
         this.disposeCommands();
+
+        this.commands.concat(providerCommands);
 
         for (const command of this.commands) {
             try {

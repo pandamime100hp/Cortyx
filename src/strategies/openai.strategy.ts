@@ -2,21 +2,25 @@
 
 import { IAIModelStrategy } from '../interfaces/ai-model';
 import { getBearerAuthHeader } from '../utilities/auth.utility';
-import { ExtensionContext } from 'vscode'
+import { ExtensionContext } from 'vscode';
+import { OpenAIModelListResponse } from '../types/openai';
+import { Output } from '../utilities/output.utility';
 import { 
     ChatCompletionOptions, 
     LLMModelListResponse, 
     ChatCompletionResponse 
 } from '../types/chat';
-import { OpenAIModelListResponse } from '../types/openai';
-import { Output } from '../utilities/output.utility';
+import { 
+    LLM_API_KEY, 
+    LLM_API_URL 
+} from '../constants/constants';
 
 
 export class OpenAIStrategy implements IAIModelStrategy{
     // https://platform.openai.com/docs/api-reference/introduction
 
-    private readonly output: Output;
-    private readonly apiKey: string;
+    private output: Output = Output.getInstance();
+    private context: ExtensionContext;
     private readonly url: string;
     readonly name: string = 'OpenAI';
 
@@ -25,23 +29,14 @@ export class OpenAIStrategy implements IAIModelStrategy{
      * @param context 
      */
     constructor(context: ExtensionContext){
-        this.output = Output.getInstance();
-
         this.output.info('OpenAI initialising...');
-        this.output.clearAndShow('OpenAI initialising...');
-
-        const apiKey = context.globalState.get<string>('apiKey');
-        const url = context.globalState.get<string>('apiUrl');
-
-        if (!apiKey || !url) {
-            this.handleError('Missing OpenAI configuration', (!apiKey ? 'API Key' : '' + !url ? 'URL' : '').trim());
+        this.context = context;
+        const url = this.context.globalState.get<string>(LLM_API_URL);
+        if (!url) {
+            this.output.error('Missing OpenAI configuration URL');
         }
-
-        this.apiKey = apiKey;
-        this.url = url;
-
+        this.url = url!;
         this.output.info('OpenAI initialised');
-        this.output.addLine('OpenAI initialised');
     }
 
     /**
@@ -51,7 +46,7 @@ export class OpenAIStrategy implements IAIModelStrategy{
      */
     async promptAi(options: ChatCompletionOptions): Promise<ChatCompletionResponse> {
         const METHOD: string = 'POST';
-        const completionsEndpoint = new URL('/chat/completions', this.url).toString();
+        const completionsEndpoint = new URL('v1/chat/completions', this.url).toString();
 
         this.output.info(`Executing ${METHOD} ${completionsEndpoint}`);
 
@@ -60,7 +55,7 @@ export class OpenAIStrategy implements IAIModelStrategy{
                 method: METHOD,
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${this.apiKey}`,
+                    Authorization: `Bearer ${await this.context.secrets.get(LLM_API_KEY)}`,
                 },
                 body: JSON.stringify({
                     model: options.model,
@@ -100,15 +95,17 @@ export class OpenAIStrategy implements IAIModelStrategy{
      */
     async getLlmModels(): Promise<LLMModelListResponse> {
         const METHOD: string = 'GET';
-        const modelsEndpoint = new URL('/models', this.url).toString();
-        const headers: Record<string, string> = getBearerAuthHeader(this.apiKey);
+        const modelsEndpoint = new URL('v1/models', this.url).toString();
 
         this.output.info(`Executing ${METHOD} ${modelsEndpoint}`);
 
         try {
             const response = await fetch(modelsEndpoint, { 
                 method: METHOD,
-                headers 
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${await this.context.secrets.get(LLM_API_KEY)}`,
+                }, 
             });
 
             this.checkResponse(response);

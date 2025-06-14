@@ -6,7 +6,7 @@ import { AIModelContext } from './context/ai-model-context';
 
 // Holds the active command registry for cleanup on extension deactivation
 let commandRegistry: CommandRegistry;
-let output: Output;
+const output: Output = Output.getInstance();;
 
 /**
  * Extension entrypoint.
@@ -14,16 +14,15 @@ let output: Output;
  * @param context Enables access to the VSCode context which contains functionality such as secrets, workspace access and more.
  */
 export async function activate(context: ExtensionContext) {
-    output = Output.getInstance();
     output.info('Cortyx AI initialising...');
     const config: Configuration = new Configuration(context);
     config.configure();
 
-    const model: AIModelContext = config.getModel();
+    const provider: AIModelContext = config.getModel();
 
-    commandRegistry = new CommandRegistry(context);
+    commandRegistry = new CommandRegistry(context, provider);
 
-    commandRegistry.getCommands(model);
+    await commandRegistry.getCommands();
     commandRegistry.registerAll();
 
     output.info('Cortyx AI initialised');

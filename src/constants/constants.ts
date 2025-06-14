@@ -8,7 +8,7 @@ export const LLM_API_KEY = 'llm_api_key';
  * 
  */
 export const GLOBAL_STATE_KEYS = {
-    LLM: 'llm',
+    PROVIDER: 'provider',
     API_URL: 'apiUrl',
     API_KEY: 'apiKey',
     MODEL: 'model',

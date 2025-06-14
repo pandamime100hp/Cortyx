@@ -1,21 +1,30 @@
-import { ExtensionContext } from "vscode";
-import { CommandStrategy } from "./command.strategy";
+import { 
+    commands, 
+    ExtensionContext 
+} from "vscode";
+import { ICommandStrategy } from "../interfaces/command-strategy";
 import { AIModelContext } from "../context/ai-model-context";
+import { ICommand } from "../interfaces/command";
 import { GetLLMModels } from "../commands/get-llm-models.command";
-import { IExtensionCommand } from "../interfaces/command";
+import { SetOpenAIAPIKey } from "../commands/openai/set-openai-api-key.command";
 
-export class OpenAICommandStrategy implements CommandStrategy {
+export class OpenAICommandStrategy implements ICommandStrategy {
     private context: ExtensionContext;
-    private model: AIModelContext;
+    private provider: AIModelContext;
 
-    constructor(context: ExtensionContext, model: AIModelContext) {
+    constructor(context: ExtensionContext, provider: AIModelContext) {
         this.context = context;
-        this.model = model;
+        this.provider = provider;
+        this.enableCommandPaletteCommands();
     }
 
-    getCommands(): IExtensionCommand[] {
+    async enableCommandPaletteCommands(): Promise<void>{
+        await commands.executeCommand('setContext', 'cortyx.provider', this.provider.getProviderName());
+    }
+
+    getCommands(): ICommand[] {
         return [
-            new GetLLMModels(this.context, this.model),
+            new SetOpenAIAPIKey(this.context),
         ];
     }
 }

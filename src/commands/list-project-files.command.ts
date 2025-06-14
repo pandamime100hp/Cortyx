@@ -5,13 +5,13 @@ import {
     window,
     workspace
 } from "vscode";
-import { IExtensionCommand } from "../interfaces/command";
+import { ICommand } from "../interfaces/command";
 import { Output } from "../utilities/output.utility";
 import { buildFileTree } from "../utilities/file-structure.utility";
 import { FileNode } from "../types/file-node";
 
 
-export class ListProjectFiles implements IExtensionCommand {
+export class ListProjectFiles implements ICommand {
     readonly id: string = 'cortyx.listProjectFiles';
     private readonly output: Output;
 
