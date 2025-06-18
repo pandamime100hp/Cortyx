@@ -1,5 +1,5 @@
 import { ExtensionContext } from 'vscode';
-import { CommandRegistry } from './registry/command-registry';
+import { CommandRegistry } from './registries/command-registry';
 import { Configuration } from './configuration/configuration';
 import { Output } from './utilities/output.utility';
 import { AIModelContext } from './context/ai-model-context';

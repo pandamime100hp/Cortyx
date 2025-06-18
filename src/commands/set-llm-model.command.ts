@@ -9,35 +9,46 @@ import { GLOBAL_STATE_KEYS } from '../constants/constants';
 import { showQuickPick } from '../utilities/input-helpers.utility';
 
 
+/**
+* Represents a command to set the LLM model in the extension.
+* It allows users to choose from a list of available models and updates the global state accordingly.
+*/
 export class SetLLMModel implements ICommand{
     private readonly output: Output = Output.getInstance();
     private context: ExtensionContext;
     readonly id: string = 'cortyx.setLlmModel';
 
     /**
-     * 
-     * @param context
-     */
+    * Creates an instance of SetLLMModel.
+    *
+    * @param context The context of the extension, which provides access to global state and commands.
+    */
     constructor(context: ExtensionContext) {
         this.context = context;
     }
 
     /**
-     * Registers the command.
-     * 
-     * @returns Registered disposable object which can be subscribed to the instance context.
-     */
+    * Registers the LLM model selection command.
+    *
+    * This command allows users to select an LLM model from a predefined list. 
+    * It returns a Disposable object that can be used to unregister the command.
+    *
+    * @returns The registered command's disposable object.
+    */
     register(): Disposable {
         this.output.info(`Registering command: ${this.id}`);
-        return commands.registerCommand(this.id, (...args) => this.execute(...args));
+        return commands.registerCommand(this.id, () => this.execute());
     }
 
     /**
-     * 
-     * @param args List of arguments required to be passed in for the execution.
-     * @returns 
-     */
-    async execute(...args: unknown[]): Promise<void> {
+    * Executes the command to select an LLM model.
+    *
+    * This function retrieves the available LLM models from global state, prompts the user to select one, 
+    * and updates the global state with the selected model. If no models are available, a warning is logged.
+    *
+    * @returns A promise that resolves when the execution is complete.
+    */
+    async execute(): Promise<void> {
         const models: string[] | undefined = this.context.globalState.get(GLOBAL_STATE_KEYS.MODELS);
 
         if (!models) {

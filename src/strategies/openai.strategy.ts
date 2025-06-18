@@ -1,7 +1,6 @@
 // openai/strategy.openai.ts
 
 import { IAIModelStrategy } from '../interfaces/ai-model';
-import { getBearerAuthHeader } from '../utilities/auth.utility';
 import { ExtensionContext } from 'vscode';
 import { OpenAIModelListResponse } from '../types/openai';
 import { Output } from '../utilities/output.utility';
@@ -16,6 +15,10 @@ import {
 } from '../constants/constants';
 
 
+/**
+ * Class representing the OpenAI strategy for AI model interactions.
+ * Implements the IAIModelStrategy interface.
+ */
 export class OpenAIStrategy implements IAIModelStrategy{
     // https://platform.openai.com/docs/api-reference/introduction
 
@@ -25,8 +28,9 @@ export class OpenAIStrategy implements IAIModelStrategy{
     readonly name: string = 'OpenAI';
 
     /**
-     * 
-     * @param context 
+     * Creates an instance of OpenAIStrategy.
+     * @param context - The VSCode extension context.
+     * @throws Will throw an error if the OpenAI URL is not configured.
      */
     constructor(context: ExtensionContext){
         this.output.info('OpenAI initialising...');
@@ -40,89 +44,54 @@ export class OpenAIStrategy implements IAIModelStrategy{
     }
 
     /**
-     * 
-     * @param options 
-     * @returns 
+     * Sends a prompt to the OpenAI API and retrieves the response.
+     * @param options - The options for the chat completion including model, messages, temperature, and max tokens.
+     * @returns A promise that resolves to the ChatCompletionResponse from OpenAI.
      */
     async promptAi(options: ChatCompletionOptions): Promise<ChatCompletionResponse> {
-        const METHOD: string = 'POST';
+        const HTTP_METHOD: string = 'POST';
         const completionsEndpoint = new URL('v1/chat/completions', this.url).toString();
 
-        this.output.info(`Executing ${METHOD} ${completionsEndpoint}`);
+        this.output.info(`Executing ${HTTP_METHOD} ${completionsEndpoint}`);
 
-        try {
-            const response = await fetch(completionsEndpoint, {
-                method: METHOD,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${await this.context.secrets.get(LLM_API_KEY)}`,
-                },
-                body: JSON.stringify({
-                    model: options.model,
-                    messages: options.messages,
-                    temperature: options.temperature ?? 0.7,
-                    max_tokens: options.max_tokens ?? 1024,
-                    stream: options.stream ?? false,
-                }),
-            });
+        const headers = await this.createHeaders();
 
-            this.checkResponse(response);
+        const body = JSON.stringify({
+            model: options.model,
+            messages: options.messages,
+            temperature: options.temperature ?? 0.7,
+            max_tokens: options.max_tokens ?? 1024,
+            stream: options.stream ?? false,
+        });
 
-            const messages: ChatCompletionResponse = await response.json();
+        const data: ChatCompletionResponse = await this.executeFetch(HTTP_METHOD, completionsEndpoint, headers, body);
 
-            this.output.info(`Response ${response.status}`);
-
-            return {
-                object: 'chat.completion',
-                id: messages.id,
-                model: messages.model,
-                created: messages.created,
-                choices: messages.choices.map(choice => ({
-                    index: choice.index,
-                    message: choice.message,
-                    finish_reason: choice.finish_reason,
-                })),
-                usage: messages.usage
-            };
-        } catch (error) {
-            this.handleError('Failed to get response from OpenAI', error);
-        }
+        return this.formatResponse(data)
     }
 
     /**
-     * 
-     * @returns 
+     * Retrieves the list of available LLM models from the OpenAI API.
+     * @returns A promise that resolves to a list of LLM models.
      */
     async getLlmModels(): Promise<LLMModelListResponse> {
-        const METHOD: string = 'GET';
+        const HTTP_METHOD: string = 'GET';
         const modelsEndpoint = new URL('v1/models', this.url).toString();
 
-        this.output.info(`Executing ${METHOD} ${modelsEndpoint}`);
+        this.output.info(`Executing ${HTTP_METHOD} ${modelsEndpoint}`);
 
-        try {
-            const response = await fetch(modelsEndpoint, { 
-                method: METHOD,
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${await this.context.secrets.get(LLM_API_KEY)}`,
-                }, 
-            });
+        const headers = await this.createHeaders();
 
-            this.checkResponse(response);
-
-            const data: OpenAIModelListResponse = await response.json();
-            const models: string[] = data.data.map(model => model.id);
-            return { models };
-        } catch (error) {
-            this.handleError('Failed to fetch models from OpenAI', error);
-        }
+        const data: OpenAIModelListResponse = await this.executeFetch(HTTP_METHOD, modelsEndpoint, headers);
+        const models: string[] = data.data.map(model => model.id);
+        return { models };
     }
 
     /**
-     * 
-     * @param response 
+     * Checks the response from the OpenAI API for errors.
+     * @param response - The response object from the fetch call.
+     * @throws Will throw an error if the response is not OK or if the content type is not JSON.
      */
-    private async checkResponse(response: Response) {
+    private async checkResponse(response: Response): Promise<void> {
         if (!response.ok) {
             const error = await response.text();
             this.handleError('OpenAI API error', error);
@@ -135,9 +104,77 @@ export class OpenAIStrategy implements IAIModelStrategy{
         }
     }
 
+    /**
+     * Creates the headers required for an API request.
+     *
+     * @returns A promise that resolves to an object containing the 'Content-Type' and 'Authorization' headers.
+     */
+    private async createHeaders(): Promise<Record<string, string>> {
+        return {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${await this.context.secrets.get(LLM_API_KEY)}`,
+        };
+    }
+
+    /**
+     * Formats the raw response from the chat completion API into a standardized structure.
+     *
+     * @param response - The raw response from the API that needs to be formatted.
+     * @returns The formatted response object.
+     */
+    private formatResponse(response: ChatCompletionResponse): ChatCompletionResponse {
+         return {
+            object: 'chat.completion',
+            id: response.id,
+            model: response.model,
+            created: response.created,
+            choices: response.choices.map(choice => ({
+                index: choice.index,
+                message: choice.message,
+                finish_reason: choice.finish_reason,
+            })),
+            usage: response.usage
+        };
+    }
+
+    /**
+     * Executes a fetch request to the specified endpoint with the given method, headers, and body.
+     *
+     * @param method - The HTTP method (GET, POST, etc.) to use for the request.
+     * @param endpoint - The URL endpoint to which the request is made.
+     * @param header - The headers to include in the request.
+     * @param body - The optional request body to send with the request.
+     * @returns A promise that resolves to the JSON response from the fetch request.
+     */
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    private async executeFetch(method: string, endpoint: string, header: Record<string, string>, body: string | null = null): Promise<any> {
+        const init = { 
+            method: method,
+            headers: header, 
+            body: body
+        };
+
+        try {
+            const response: Response = await fetch(endpoint, init);
+
+            this.checkResponse(response);
+
+            return await response.json();
+        } catch (error) {
+            this.handleError('Failed to fetch models from OpenAI', error);
+        }
+    }
+
+    /**
+     * Handles errors by logging an error message and throwing a new error.
+     *
+     * @param message - A message describing the error context.
+     * @param error - The caught error object or message.
+     * @returns This function does not return a value; it always throws an error.
+     */
     private handleError(message: string, error: unknown): never {
         const errorMessage = `${message}: ${String(error)}`;
-        this.output.addLine(errorMessage);
+        this.output.add(errorMessage, true);
         this.output.error(errorMessage);
         throw new Error(errorMessage);
     }

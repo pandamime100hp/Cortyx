@@ -1,4 +1,4 @@
-//file_structure.ts
+// utilities/file-structure.utility.ts
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -8,7 +8,10 @@ import { FileNode } from '../types/file-node';
  * 
  */
 const IGNORE = [
-    '.git', 'coverage', 'node_modules', 'out'
+    '.git', 
+    'coverage', 
+    'node_modules', 
+    'out'
 ]
 
 /**

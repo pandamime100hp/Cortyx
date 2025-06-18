@@ -1,6 +1,14 @@
-//mocks/vscode.ts
-
-import { ExtensionContext, Memento, OutputChannel } from "vscode";
+import { 
+  Extension, 
+  ExtensionContext, 
+  ExtensionMode, 
+  GlobalEnvironmentVariableCollection, 
+  LanguageModelAccessInformation, 
+  Memento, 
+  OutputChannel, 
+  SecretStorage, 
+  Uri 
+} from "vscode";
 
 
 export const mockOutputChannel: OutputChannel = {
@@ -10,7 +18,8 @@ export const mockOutputChannel: OutputChannel = {
     name: '',
     dispose: jest.fn(),
     append: jest.fn(),
-    hide: jest.fn()
+    hide: jest.fn(),
+    replace: jest.fn()
 };
 
 export const mockGlobalState: ExtensionContext['globalState'] = {
@@ -19,7 +28,9 @@ export const mockGlobalState: ExtensionContext['globalState'] = {
     if (key === 'apiUrl') return 'https://mock-api.com/v1';
     return undefined;
   }),
-  update: jest.fn()
+  update: jest.fn(),
+  keys: jest.fn(),
+  setKeysForSync: jest.fn()
 };
 
 export const ProgressLocation = {
@@ -28,19 +39,36 @@ export const ProgressLocation = {
   Notification: 15
 };
 
+const mockSecrets: SecretStorage = {
+  get: jest.fn(),
+  store: jest.fn(),
+  delete: jest.fn(),
+  onDidChange: jest.fn()
+}
+
 export const mockContext: ExtensionContext = {
   subscriptions: [],
   workspaceState: {} as Memento,
-  globalState: mockGlobalState as unknown as Memento,
+  globalState: mockGlobalState,
   extensionPath: '',
   asAbsolutePath: jest.fn(),
   storagePath: '',
   globalStoragePath: '',
-  logPath: ''
-}
+  logPath: '',
+  secrets: mockSecrets,
+  extensionUri: {} as Uri,
+  environmentVariableCollection: {} as GlobalEnvironmentVariableCollection,
+  storageUri: {} as Uri,
+  globalStorageUri: {} as Uri,
+  logUri: {} as Uri,
+  extensionMode: {} as ExtensionMode,
+  extension: {} as Extension<unknown>,
+  languageModelAccessInformation: {} as LanguageModelAccessInformation
+} as ExtensionContext;
 
 export const commands = {
-  registerCommand: jest.fn(),
+  registerCommand: jest.fn().mockReturnValue({ dispose: jest.fn() }),
+  executeCommand: jest.fn()
 };
   
 export const window = {
