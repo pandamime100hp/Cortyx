@@ -2,7 +2,7 @@
 
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { buildFileTree } from "../../src/utilities/file_structure";
+import { buildFileTree } from "../../src/utilities/file-structure.utility";
 
 jest.mock('fs/promises');
 

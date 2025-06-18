@@ -11,12 +11,20 @@ import { AIModelContext } from "../context/ai-model-context";
 import { Output } from "../utilities/output.utility";
 import { GLOBAL_STATE_KEYS } from "../constants/constants";
 
+/**
+ * Represents a command that interacts with the AI model to generate responses based on user prompts.
+ */
 export class PromptAI implements ICommand {
     readonly id: string = 'cortyx.promptAi';
     private output: Output = Output.getInstance();
     private context: ExtensionContext;
     private provider: AIModelContext;
 
+    /**
+     * Creates an instance of the PromptAI command.
+     * @param context The context of the extension, providing access to global state and services.
+     * @param provider The AI model context, which facilitates interaction with the AI model.
+     */
     constructor(context: ExtensionContext, provider: AIModelContext) {
         this.output.info(`${provider.getProviderName()} Prompt initialising...`);
         this.context = context;
@@ -24,19 +32,20 @@ export class PromptAI implements ICommand {
     }
 
     /**
-     * 
+     * Registers the AI prompt command with the VSCode command palette.
+     * @returns A disposable that unregisters the command when disposed.
      */
     register(): Disposable {
         this.output.info(`Registering command: ${this.id}`);
-        return commands.registerCommand(this.id, (...args) => this.execute(...args));
+        return commands.registerCommand(this.id, () => this.execute());
     }
 
     /**
-     * 
-     * @param args 
-     * @returns 
+     * Executes the AI prompt command, gathering user input and interacting with the AI model.
+     * @param args Optional arguments that may be passed from the command palette.
+     * @returns A promise that resolves when the command execution is complete.
      */
-    async execute(...args: unknown[]): Promise<void> {
+    async execute(): Promise<void> {
         const prompt: string | undefined = await showInputBox(
             'Enter your AI prompt',
             false,

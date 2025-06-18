@@ -18,6 +18,7 @@ export interface IAIModelStrategy {
      * @param options Options for the chat completion including messages, model, etc.
      * @returns A promise that resolves with the completion response.
      */
+    /* eslint-disable no-unused-vars */
     promptAi(options: ChatCompletionOptions): Promise<ChatCompletionResponse>;
 
     /**

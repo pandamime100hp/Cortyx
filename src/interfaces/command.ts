@@ -12,5 +12,5 @@ export interface ICommand {
    * 
    * @param args 
    */
-  execute(...args: unknown[]): Promise<void> | void;
+  execute(): Promise<void> | void;
 }

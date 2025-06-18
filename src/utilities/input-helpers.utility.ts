@@ -1,20 +1,15 @@
-//inputHelpers.ts
-
 import { window } from 'vscode'
 
 /**
- * Abstract function for creating a quick pick input enabling end user to input information.
- * 
- * @param placeholder Text displayed to indicate what to do.
- * @param items List of strings containing to display as options.
- * @param errorMsg Text displayed from a VSCode Warning Window if an error occurs.
- * @returns Promise of a string if successful, otherwise undefined.
+ * Displays a quick pick input for user selection.
+ *
+ * @param placeholder - Text indicating what to do.
+ * @param items - Array of strings to be displayed as options.
+ * @param errorMsg - Message shown if the user cancels or an error occurs.
+ * @returns A promise resolving to the selected string, or undefined if canceled.
  */
 export async function showQuickPick(placeholder: string, items: string[], errorMsg: string): Promise<string | undefined> {
-    const quickPick: string | undefined = await window.showQuickPick(
-        items, 
-        { placeHolder: placeholder, }
-    );
+    const quickPick = await window.showQuickPick(items, { placeHolder: placeholder});
 
     if (!quickPick) {
         window.showWarningMessage(errorMsg);
@@ -24,19 +19,19 @@ export async function showQuickPick(placeholder: string, items: string[], errorM
 }
 
 /**
- * Abstract function for creating an input box enabling end user to input information.
- * 
- * @param prompt Text displayed to user indicating what to do.
- * @param secret Boolean value which sets the input box to a secret format or not.
- * @param validation Text which is compared against the entered value for validation.
- * @param validationMsg Text displayed if the user enters input that does not fit the validation check.
- * @param errorMsg Text displayed to user if there was an error.
- * @returns Promise of a string if successful, otherwise undefined.
+ * Displays an input box for user input.
+ *
+ * @param prompt - Text displayed to the user.
+ * @param secret - Whether the input should be masked.
+ * @param validation - A validation rule (could be regex or a specific string).
+ * @param validationMsg - Message displayed if validation fails.
+ * @param errorMsg - Message shown if an error occurs.
+ * @returns A promise resolving to the input string, or undefined if canceled.
  */
 export async function showInputBox(prompt: string, secret: boolean = false, validation: string, validationMsg: string, errorMsg: string): Promise<string | undefined> {
-    const inputBox: string | undefined = await window.showInputBox({
+    const inputBox = await window.showInputBox({
         prompt: prompt,
-        password: secret ? true : false,
+        password: secret,
         validateInput: input => input.trim() === validation ? validationMsg : undefined
     });
 

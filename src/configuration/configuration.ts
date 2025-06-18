@@ -1,5 +1,3 @@
-// configuration/configuration.ts
-
 import { ExtensionContext } from "vscode";
 import { LLM_PROVIDER } from '../constants/constants';
 import { showQuickPick } from '../utilities/input-helpers.utility';
@@ -11,20 +9,21 @@ import { ICommand } from "../interfaces/command";
 
 
 export class Configuration{
-    private readonly LLM_PROVIDERS: string[] = ['OpenAI', 'Ollama'];
+    private readonly LLM_PROVIDERS: string[] = ['OpenAI'];
     private readonly output: Output = Output.getInstance();
     private context: ExtensionContext;
     providerConfiguration: IProviderConfiguration | undefined;
     provider: string | undefined;
 
+    /* eslint-disable no-unused-vars */
     private providerConfigurations: { [key: string]: new (context: ExtensionContext) => IProviderConfiguration } = {
         OpenAI: OpenAIConfiguration,
         // Ollama: OllamaStrategy
     };
 
     /**
-     * 
-     * @param context 
+     * Creates an instance of Configuration.
+     * @param context - The extension context provided by VS Code.
      */
     constructor(context: ExtensionContext) {
         this.output.info('Configuration initialising...')
@@ -34,7 +33,7 @@ export class Configuration{
     }
 
     /**
-     * 
+     * Configures the LLM provider if not already set, and initializes the provider configuration.
      */
     async configure() {
         if (!this.provider) {
@@ -45,6 +44,11 @@ export class Configuration{
         this.providerConfiguration.configure();
     }
 
+    /**
+     * Retrieves the provider configuration based on the selected provider.
+     * @returns The provider configuration instance.
+     * @throws Will throw an error if there is no strategy for the selected provider.
+     */
     getProviderConfiguration(): IProviderConfiguration {
         const Provider = this.providerConfigurations[this.provider ?? ''];
         if (!Provider) {
@@ -55,8 +59,9 @@ export class Configuration{
     }
 
     /**
-     * 
-     * @returns 
+     * Retrieves the AI model context based on the current provider configuration.
+     * @returns The AI model context.
+     * @throws Will throw an error if the provider configuration is not set.
      */
     getModel(): AIModelContext {
         if (!this.providerConfiguration) {
@@ -66,7 +71,9 @@ export class Configuration{
     }
 
     /**
-     * 
+     * Retrieves the command list provided by the current provider configuration.
+     * @returns An array of commands.
+     * @throws Will throw an error if the provider configuration is not set.
      */
     getCommands(): ICommand[] {
         if (!this.providerConfiguration) {
@@ -76,7 +83,8 @@ export class Configuration{
     }
 
     /**
-     * 
+     * Prompts the user to select a LLM provider and updates the global state with the selection.
+     * @throws Will throw an error if no LLM provider is chosen.
      */
     async configureLlmProvider() {
         const PLACEHOLDER: string = 'Select the LLM provider';

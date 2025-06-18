@@ -1,5 +1,3 @@
-// command-registry.ts
-
 import { 
     Disposable,
     ExtensionContext
@@ -12,6 +10,10 @@ import { OpenAICommandStrategy } from '../strategies/openai-command.strategy';
 import { GlobalCommandStrategy } from '../strategies/global-command.strategy';
 
 
+/**
+ * CommandRegistry handles the registration and disposal of commands 
+ * within the VSCode extension context.
+ */
 export class CommandRegistry {
     private readonly output: Output = Output.getInstance();
     private readonly context: ExtensionContext;
@@ -20,11 +22,10 @@ export class CommandRegistry {
     private commands: ICommand[] = []
 
     /**
-     * Initialises the available commands found as `*.command.ts` under the `commands` folder. 
-     * This enables the commands to register with VSCode for use with the command pallette.
+     * Initializes the CommandRegistry with the given context and AI model provider.
      * 
-     * @param context 
-     * @param strategy 
+     * @param context - The VSCode extension context.
+     * @param provider - The AIModelContext providing the model for commands.
      */
     constructor(context: ExtensionContext, provider: AIModelContext) {
         this.context = context;
@@ -32,7 +33,13 @@ export class CommandRegistry {
         this.output.info('Command Registry initialised')
     }
 
-    async getCommands() {
+    /**
+     * Retrieves and registers the available commands for the current provider.
+     * 
+     * @returns A promise that resolves when the commands have been retrieved and registered.
+     * @throws If no command strategy is found for the provider.
+     */
+    async getCommands(): Promise<void> {
         this.output.info('Getting commands');
         const globalCommands: GlobalCommandStrategy = new GlobalCommandStrategy(this.context, this.provider);
         globalCommands.getCommands().forEach(command => {
@@ -67,24 +74,35 @@ export class CommandRegistry {
     }
 
     /**
-     * Registers all provided commands with VSCode. If a new strategy is set, you must 
-     * reregister the commands by calling `registerCommands`.
+     * Registers all provided commands with VSCode. 
+     * If a new strategy is set, you must re-register the commands by calling `registerCommands`.
+     * 
+     * @param providerCommands - An optional array of commands to register.
      */
     registerAll(providerCommands: ICommand[] = []): void {
         this.output.info(`Registering all commands`)
         this.disposeCommands();
 
-        this.commands.concat(providerCommands);
+        this.commands = this.commands.concat(providerCommands);
 
-        for (const command of this.commands) {
-            try {
-                const disposable: Disposable = command.register();
-                this.context.subscriptions.push(disposable);
-                this.disposables.push(disposable);
-                this.output.info(`Registered command: ${command.id}`);
-            } catch (error) {
-                this.output.error(`Failed to register command: ${command.id} ${String(error)}`);
-            }
+        this.commands.forEach(command => {
+            this.registerCommand(command);
+        });
+    }
+
+    /**
+     * Registers a single command with VSCode and handles any errors during the registration.
+     * 
+     * @param command - The command to register.
+     */
+    private registerCommand(command: ICommand): void {
+        try {
+            const disposable: Disposable = command.register();
+            this.context.subscriptions.push(disposable);
+            this.disposables.push(disposable);
+            this.output.info(`Registered command: ${command.id}`);
+        } catch (error) {
+            this.output.error(`Failed to register command: ${command.id} ${String(error)}`);
         }
     }
 }

@@ -10,35 +10,42 @@ import { Output } from "../utilities/output.utility";
 import { buildFileTree } from "../utilities/file-structure.utility";
 import { FileNode } from "../types/file-node";
 
-
+/**
+ * Class that implements the ICommand interface to list all project files
+ * in the currently opened workspace in Visual Studio Code.
+ * Handles command registration and execution with appropriate progress reporting.
+ */
 export class ListProjectFiles implements ICommand {
     readonly id: string = 'cortyx.listProjectFiles';
     private readonly output: Output;
 
     /**
-     * 
-     * @param context 
+     * Creates an instance of ListProjectFiles.
+     * Initializes the output utility instance used for logging.
      */
     constructor() {
         this.output = Output.getInstance();
     }
     
     /**
-     * Registers the command.
-     * 
-     * @returns Registered disposable object which can be subscribed to the instance context.
+     * Registers the command to list project files.
+     * Logs the registration process and returns a disposable object
+     * that can be used to unregister the command.
+     *
+     * @returns The disposable object for command registration.
      */
     register(): Disposable {
         this.output.info(`Registering command: ${this.id}`);
-        return commands.registerCommand(this.id, (...args) => this.execute(...args));
+        return commands.registerCommand(this.id, () => this.execute());
     }
     
     /**
-     * 
-     * @param _args List of arguments required to be passed in for the execution.
-     * @returns 
+     * Executes the command to list the project files in the currently opened workspace.
+     * Displays progress and handles the potential errors during file tree building.
+     *
+     * @returns This method does not return a value.
      */
-    execute(...args: unknown[]): void {
+    execute(): void {
         const workspaceFolder = workspace.workspaceFolders?.[0];
         if (!workspaceFolder) {
             window.showErrorMessage('No workspace is open');

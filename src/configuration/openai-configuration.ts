@@ -11,13 +11,25 @@ import {
     LLM_API_KEY 
 } from '../constants/constants';
 
+
+/**
+ * Class representing the configuration for the OpenAI provider.
+ * This class handles the initialization and management of the 
+ * OpenAI API URL and API key, including user prompts for 
+ * configuration.
+ */
 export class OpenAIConfiguration implements IProviderConfiguration {
     readonly context: ExtensionContext;
     output: Output = Output.getInstance();
 
     url: string | undefined;
+    /* eslint-disable no-undef */
     private apiKey: Thenable<string | undefined> | undefined;
 
+    /**
+     * Creates an instance of OpenAIConfiguration.
+     * @param context The context provided by the VS Code extension API.
+     */
     constructor(context: ExtensionContext) {
         this.output.info('OpenAIConfiguration initialising...');
         this.context = context;
@@ -27,6 +39,11 @@ export class OpenAIConfiguration implements IProviderConfiguration {
         this.output.info('OpenAIConfiguration initialised');
     }
 
+    /**
+     * Configures the OpenAI API settings.
+     * Prompts the user to enter the API key and URL if they are not already set.
+     * @returns A promise that resolves when configuration is complete.
+     */
     async configure() {
         if (!this.apiKey) {
             await this.configureApiKey();
@@ -37,10 +54,18 @@ export class OpenAIConfiguration implements IProviderConfiguration {
         }
     }
 
+    /**
+     * Gets the AI model strategy associated with OpenAI.
+     * @returns An instance of OpenAIStrategy.
+     */
     getStrategy(): IAIModelStrategy {
         return new OpenAIStrategy(this.context);
     }
 
+    /**
+     * Retrieves a list of commands associated with OpenAI configuration.
+     * @returns An array of commands for managing OpenAI settings.
+     */
     getCommands(): ICommand[] {
         return [
             new SetOpenAIAPIKey(this.context)
@@ -48,7 +73,8 @@ export class OpenAIConfiguration implements IProviderConfiguration {
     }
 
     /**
-     * 
+     * Prompts the user to input the LLM provider API URL and updates the global state.
+     * @returns A promise that resolves when the URL has been configured.
      */
     async configureUrl() {
         const PROMPT: string = 'Input the LLM provider API URL';
@@ -68,7 +94,8 @@ export class OpenAIConfiguration implements IProviderConfiguration {
     }
 
     /**
-     * 
+     * Prompts the user to input the LLM provider API key and updates the global state.
+     * @returns A promise that resolves when the API key has been configured.
      */
     async configureApiKey() {
         const PROMPT: string = 'Input the LLM provider API key';
