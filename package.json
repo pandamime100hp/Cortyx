@@ -13,11 +13,11 @@
   "files": [
     "out",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "media"
   ],
-  "activationEvents": [
-    "onStartupFinished"
-  ],
+  "activationEvents": [],
+  "icon": "./media/icon.png",
   "contributes": {
     "commands": [{
         "command": "cortyx.getLlmModels",
@@ -37,7 +37,26 @@
         "category": "OpenAI",
         "enablement": "cortyx.provider == 'OpenAI'"
       }
-    ]
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "cortyx",
+          "title": "Cortyx",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "cortyx": [
+        {
+          "id": "cortyxView",
+          "type": "webview",
+          "name": "Overview",
+          "icon": "media/icon.svg"
+        }
+      ]
+    }
   },
   "engines": {
     "vscode": "^1.100.0"
@@ -49,7 +68,7 @@
     "lint": "eslint",
     "build": "rm -rf out; tsc --build",
     "package": "rm cortyx-*.vsix; vsce package",
-    "uninstall": "if command -v code >/dev/null 2>&1; then code --uninstall-extension Pandamime100hp.Cortyx; fi",
+    "uninstall": "if command -v code >/dev/null 2>&1; then code --uninstall-extension PandamimeLabs.Cortyx; fi",
     "install": "if command -v code >/dev/null 2>&1; then code --install-extension cortyx-*.vsix; fi",
     "install:full": "npm run uninstall; npm run build; npm run package; npm run install"
   },
