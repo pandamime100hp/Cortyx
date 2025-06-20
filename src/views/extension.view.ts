@@ -19,6 +19,7 @@ export class AIAssistantViewProvider implements WebviewViewProvider {
         this.output.info('Cortyx view initialised');
     }
 
+    /* eslint-disable @typescript-eslint/no-unused-vars, no-unused-vars */
     resolveWebviewView(webviewView: WebviewView, _context: WebviewViewResolveContext, _token: CancellationToken) {
         this.output.info('Resolving Cortyx view');
         webviewView.webview.options = {

@@ -1,4 +1,4 @@
-import { commands, ExtensionContext, window } from 'vscode';
+import { ExtensionContext, window } from 'vscode';
 import { CommandRegistry } from './registries/command-registry';
 import { Configuration } from './configuration/configuration';
 import { Output } from './utilities/output.utility';
