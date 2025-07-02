@@ -3,10 +3,11 @@ import { CommandRegistry } from './registries/command-registry';
 import { Configuration } from './configuration/configuration';
 import { Output } from './utilities/output.utility';
 import { AIModelContext } from './context/ai-model-context';
-import { AIAssistantViewProvider } from './views/extension.view';
+import { CortyxViewProvider } from './views/extension.view';
 
 // Holds the active command registry for cleanup on extension deactivation
 let commandRegistry: CommandRegistry;
+let view: CortyxViewProvider;
 const output: Output = Output.getInstance();;
 
 /**
@@ -16,17 +17,22 @@ const output: Output = Output.getInstance();;
  */
 export async function activate(context: ExtensionContext) {
     output.info('Cortyx AI initialising...');
+
+    // Configures initial extension settings
     const config: Configuration = new Configuration(context);
     config.configure();
 
+    // Gets the selected provider model
     const provider: AIModelContext = config.getModel();
 
+    // Registers all appropriate pallette commands based on selected provider
     commandRegistry = new CommandRegistry(context, provider);
     await commandRegistry.getCommands();
     commandRegistry.registerAll();
 
-    const view = new AIAssistantViewProvider(context.extensionUri);
-    const disposable = window.registerWebviewViewProvider('cortyxView', view);
+    // Registers Cortyx view enabling user interaction with the registered provider LLM.
+    view = new CortyxViewProvider(context.extensionUri);
+    const disposable = window.registerWebviewViewProvider(view.id, view);
     context.subscriptions.push(disposable);
 
     output.info('Cortyx AI initialised');
@@ -38,5 +44,6 @@ export async function activate(context: ExtensionContext) {
 export function deactivate() {
     output.warn('Cortyx AI deactivating...')
     commandRegistry?.disposeCommands();
+    view?.dispose();
     console.log('Cortyx AI deactivated');
 }

@@ -1,0 +1,48 @@
+body {
+	background-color: transparent;
+}
+
+.prompt-input-textarea {
+	max-width: 100%;
+	margin: 5px;
+}
+
+.dev-button, 
+.test-button, 
+.review-button {
+	flex: 1 1 30%; /* allows button to grow/shrink and sets minimum width */
+	min-width: 80px;
+	max-width: max-content;
+	margin: 0 0;
+	max-width: 100%;
+	min-width: 5rem;
+}
+
+.dev-button.selected,
+.test-button.selected,
+.review-button.selected {
+    background-color: #007acc;
+    color: white;
+    border-color: #005a9e;
+}
+
+.button-container {
+	display: flex;
+	flex-wrap: wrap;
+	/*justify-content: space-between; /* or space-around/center depending on desired look */
+	max-width: 100%;
+}
+
+.loading-indicator {
+	display: none;
+	text-align:center; 
+	margin-top:auto;
+}
+
+.ui-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 1rem;
+	gap: 1rem;
+}

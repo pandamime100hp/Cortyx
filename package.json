@@ -17,7 +17,7 @@
     "media"
   ],
   "activationEvents": [],
-  "icon": "./media/icon.png",
+  "icon": "media/images/icon.png",
   "contributes": {
     "commands": [{
         "command": "cortyx.getLlmModels",
@@ -43,7 +43,7 @@
         {
           "id": "cortyx",
           "title": "Cortyx",
-          "icon": "media/icon.svg"
+          "icon": "media/images/icon.svg"
         }
       ]
     },
@@ -53,7 +53,7 @@
           "id": "cortyxView",
           "type": "webview",
           "name": "Overview",
-          "icon": "media/icon.svg"
+          "icon": "media/images/icon.svg"
         }
       ]
     }
@@ -67,6 +67,7 @@
     "coverage": "npx jest --coverage",
     "lint": "eslint",
     "build": "rm -rf out; tsc --build",
+    "watch": "tsc -w -p ./",
     "package": "rm cortyx-*.vsix; vsce package",
     "uninstall": "if command -v code >/dev/null 2>&1; then code --uninstall-extension PandamimeLabs.Cortyx; fi",
     "install": "if command -v code >/dev/null 2>&1; then code --install-extension cortyx-*.vsix; fi",

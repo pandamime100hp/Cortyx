@@ -10,6 +10,8 @@ import { showInputBox } from "../utilities/input-helpers.utility";
 import { AIModelContext } from "../context/ai-model-context";
 import { Output } from "../utilities/output.utility";
 import { GLOBAL_STATE_KEYS } from "../constants/constants";
+import { Prompt } from "../types/prompt";
+import { DEV_PROMPT, REVIEW_PROMPT, TEST_PROMPT } from "../constants/ai-prompts";
 
 /**
  * Represents a command that interacts with the AI model to generate responses based on user prompts.
@@ -19,6 +21,7 @@ export class PromptAI implements ICommand {
     private output: Output = Output.getInstance();
     private context: ExtensionContext;
     private provider: AIModelContext;
+    private promptMode: Prompt = Prompt.REVIEW;
 
     /**
      * Creates an instance of the PromptAI command.
@@ -29,6 +32,7 @@ export class PromptAI implements ICommand {
         this.output.info(`${provider.getProviderName()} Prompt initialising...`);
         this.context = context;
         this.provider = provider;
+        this.output.info(`${provider.getProviderName()} Prompt initialised`);
     }
 
     /**
@@ -37,7 +41,7 @@ export class PromptAI implements ICommand {
      */
     register(): Disposable {
         this.output.info(`Registering command: ${this.id}`);
-        return commands.registerCommand(this.id, () => this.execute());
+        return commands.registerCommand(this.id, (args?: { prompt?: string }) => this.execute(args));
     }
 
     /**
@@ -45,14 +49,19 @@ export class PromptAI implements ICommand {
      * @param args Optional arguments that may be passed from the command palette.
      * @returns A promise that resolves when the command execution is complete.
      */
-    async execute(): Promise<void> {
-        const prompt: string | undefined = await showInputBox(
+    async execute(args?: { prompt?: string, mode?: string }): Promise<void> {
+        const prompt: string | undefined = args?.prompt || await showInputBox(
             'Enter your AI prompt',
             false,
             '',
             'Prompt cannot be empty',
             'No prompt was entered'
         );
+
+        if (!prompt) {
+            this.output.warn('No prompt was provided.');
+            return;
+        }
 
         const model: string | undefined = this.context.globalState.get(GLOBAL_STATE_KEYS.MODEL)
         if (!model){
@@ -61,11 +70,23 @@ export class PromptAI implements ICommand {
             return;
         }
 
-        const BASE_PROMPT: string = 'You are an experienced Microsoft software developer with years of experience in web development. You are familiar with the best practices and standards set out by MS. You have been tasked with helping me on my project. Review the below input and provide critical feedback giving justifications:\n'
+        let base_prompt: string = '';
+
+        switch(args?.mode || this.promptMode) {
+            case Prompt.DEV:
+                base_prompt = DEV_PROMPT;
+                break;
+            case Prompt.TEST:
+                base_prompt = TEST_PROMPT;
+                break;
+            default: 
+                base_prompt = REVIEW_PROMPT;
+                break;
+        }
 
         const options: ChatCompletionOptions = {
             model: String(model),
-            messages: [{role: 'user', content: String(BASE_PROMPT + prompt)}]
+            messages: [{role: 'user', content: String(base_prompt + prompt)}]
         }
 
         this.output.clearAndShow('🤖 Waiting for AI Response...');
@@ -80,5 +101,4 @@ export class PromptAI implements ICommand {
             return;
         }
     }
-    
 }
