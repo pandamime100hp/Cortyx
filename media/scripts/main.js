@@ -1,9 +1,11 @@
 // @ts-check
 
 (function () {
+    /* eslint-disable no-undef */
     const vscode = acquireVsCodeApi();
     // const oldState = vscode.getState() || {};
 
+    /* eslint-disable no-undef */
     const promptButton = document.querySelector('.prompt-button');
     const resetButton = document.querySelector('.reset-button');
     const loadingIndicator = document.getElementById('loading-indicator');

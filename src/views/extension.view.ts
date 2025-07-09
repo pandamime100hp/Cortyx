@@ -10,6 +10,7 @@ import {
 import { Output } from '../utilities/output.utility';
 import { mainView } from '../constants/html';
 import { Prompt } from '../types/prompt';
+import { IAIAssistantMessage } from '../interfaces/webview-message';
 
 export class CortyxViewProvider implements WebviewViewProvider {
     private readonly output: Output = Output.getInstance();
@@ -91,7 +92,6 @@ export class CortyxViewProvider implements WebviewViewProvider {
         this.output.info('Cortyx view disposed.');
     }
 
-    /* eslint-disable no-unused-vars */
     private _getHtmlForWebview(webview: Webview): string {
 		const styleMainUri = webview.asWebviewUri(Uri.joinPath(this.extensionUri, 'media', 'styles/main.css'));
         const styleVsCodeUri = webview.asWebviewUri(Uri.joinPath(this.extensionUri, 'media', 'styles/vscode.css'));
